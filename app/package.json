@@ -1,0 +1,35 @@
+{
+    "main": "1ogin.html",
+    "name": "cloud",
+    "description": "demo appof node-webkit",
+    "version": "1.0.0",
+    "keywords": [
+        "demo",
+        "node-webkit"
+    ],
+    "window": {
+        "title": "Browser Manage",
+        "icon": "link.png",
+        "toolbar": false,
+        "frame": true,
+        "width": 1000,
+        "height": 720,
+        "position": "center",
+        "min_width": 1280,
+        "min_height": 720,
+        "maxwidth": 1280,
+        "maxheight": 720,
+        "as_desktop": false,
+        "resizable": true,
+        "always-on-top": true,
+        "fullscreen": false,
+        "show_in_taskbar": true,
+        "show": true,
+        "kiosk": false
+    },
+    "webkit": {
+        "plugin": true,
+        "java": false,
+        "page-cache": false
+    }
+}

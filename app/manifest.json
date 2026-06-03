@@ -1,0 +1,29 @@
+{
+   "action": {
+      "default_icon": {
+         "128": "icons/128.png"
+      }
+   },
+   "background": {
+      "service_worker": "js/background.js"
+   },
+   "content_security_policy": {
+      "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+   },
+   "default_locale": "en",
+   "description": "__MSG_description__",
+   "homepage_url": "https://signmaker.io/",
+   "icons": {
+      "128": "icons/128.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8EqyicI+DjfvXsVwI7X//u6I/wPXeMigWmaVOMvqBAtRxZvpSmYc9lWOaeto26gjNTMV4VC0JWPRJBMflIs24XE0y1g2tiF+MOlSIIHreHCvOB5l9TVGtC66h8QXtpZJpKRIe21s7Y6ycPdnY7X/W7IBj1guXqosWPQBL4UyGTH5nw3pV593hPfGe/QCHetnxTedIUgCx3J1dEcDuvU1GIIMCj9Ml9ZU4xUnKOHqC1UgaTmQW9WOxJFH+wWxugk97dBEipYY9Q9gsiTCnCwVUZ7u4k2qfRqM4uRfN4sGWlXkhR8kDz1j3lBrTSOy6zJRCTx+xyCkZUy7766/KDnYxQIDAQAB",
+   "manifest_version": 3,
+   "name": "__MSG_name__",
+   "options_page": "index.html",
+		"permissions": [
+			"activeTab",
+			"storage"
+		],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.0.13"
+}
