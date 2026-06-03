@@ -112,14 +112,982 @@
         }
     };
 
+    var DESKTOP_TRANSLATIONS = {
+        "en": {
+                "title": "Unsaved project",
+                "message": "Close application?",
+                "sub": "If the project is not saved, changes will be lost.",
+                "close": "Close",
+                "cancel": "Cancel",
+                "minimize": "Minimize",
+                "maximize": "Maximize",
+                "restore": "Restore",
+                "search": "Search"
+        },
+        "cs": {
+                "title": "Neuložený projekt",
+                "message": "Zavřít aplikaci?",
+                "sub": "Pokud projekt není uložen, změny budou ztraceny.",
+                "close": "Zavřít",
+                "cancel": "Zrušit",
+                "minimize": "Minimalizovat",
+                "maximize": "Maximalizovat",
+                "restore": "Obnovit",
+                "search": "Hledat"
+        },
+        "es": {
+                "title": "Proyecto no guardado",
+                "message": "¿Cerrar la aplicación?",
+                "sub": "Si el proyecto no está guardado, los cambios se perderán.",
+                "close": "Cerrar",
+                "cancel": "Cancelar",
+                "minimize": "Minimizar",
+                "maximize": "Maximizar",
+                "restore": "Restaurar",
+                "search": "Buscar"
+        },
+        "de": {
+                "title": "Nicht gespeichertes Projekt",
+                "message": "Anwendung schließen?",
+                "sub": "Wenn das Projekt nicht gespeichert ist, gehen die Änderungen verloren.",
+                "close": "Schließen",
+                "cancel": "Abbrechen",
+                "minimize": "Minimieren",
+                "maximize": "Maximieren",
+                "restore": "Wiederherstellen",
+                "search": "Suchen"
+        },
+        "fr": {
+                "title": "Projet non enregistré",
+                "message": "Fermer l’application ?",
+                "sub": "Si le projet n’est pas enregistré, les modifications seront perdues.",
+                "close": "Fermer",
+                "cancel": "Annuler",
+                "minimize": "Réduire",
+                "maximize": "Agrandir",
+                "restore": "Restaurer",
+                "search": "Rechercher"
+        },
+        "el": {
+                "title": "Μη αποθηκευμένο έργο",
+                "message": "Κλείσιμο εφαρμογής;",
+                "sub": "Αν το έργο δεν έχει αποθηκευτεί, οι αλλαγές θα χαθούν.",
+                "close": "Κλείσιμο",
+                "cancel": "Ακύρωση",
+                "minimize": "Ελαχιστοποίηση",
+                "maximize": "Μεγιστοποίηση",
+                "restore": "Επαναφορά",
+                "search": "Αναζήτηση"
+        },
+        "ar": {
+                "title": "مشروع غير محفوظ",
+                "message": "هل تريد إغلاق التطبيق؟",
+                "sub": "إذا لم يتم حفظ المشروع، ستفقد التغييرات.",
+                "close": "إغلاق",
+                "cancel": "إلغاء",
+                "minimize": "تصغير",
+                "maximize": "تكبير",
+                "restore": "استعادة",
+                "search": "بحث"
+        },
+        "pt": {
+                "title": "Projeto não guardado",
+                "message": "Fechar a aplicação?",
+                "sub": "Se o projeto não estiver guardado, as alterações serão perdidas.",
+                "close": "Fechar",
+                "cancel": "Cancelar",
+                "minimize": "Minimizar",
+                "maximize": "Maximizar",
+                "restore": "Restaurar",
+                "search": "Pesquisar"
+        },
+        "ru": {
+                "title": "Несохранённый проект",
+                "message": "Закрыть приложение?",
+                "sub": "Если проект не сохранён, изменения будут потеряны.",
+                "close": "Закрыть",
+                "cancel": "Отмена",
+                "minimize": "Свернуть",
+                "maximize": "Развернуть",
+                "restore": "Восстановить",
+                "search": "Поиск"
+        },
+        "uk": {
+                "title": "Незбережений проєкт",
+                "message": "Закрити застосунок?",
+                "sub": "Якщо проєкт не збережено, зміни буде втрачено.",
+                "close": "Закрити",
+                "cancel": "Скасувати",
+                "minimize": "Згорнути",
+                "maximize": "Розгорнути",
+                "restore": "Відновити",
+                "search": "Пошук"
+        },
+        "he": {
+                "title": "פרויקט שלא נשמר",
+                "message": "לסגור את היישום?",
+                "sub": "אם הפרויקט לא נשמר, השינויים יאבדו.",
+                "close": "סגור",
+                "cancel": "ביטול",
+                "minimize": "מזער",
+                "maximize": "הגדל",
+                "restore": "שחזר",
+                "search": "חיפוש"
+        },
+        "hr": {
+                "title": "Nespremljeni projekt",
+                "message": "Zatvoriti aplikaciju?",
+                "sub": "Ako projekt nije spremljen, promjene će biti izgubljene.",
+                "close": "Zatvori",
+                "cancel": "Odustani",
+                "minimize": "Smanji",
+                "maximize": "Povećaj",
+                "restore": "Vrati",
+                "search": "Traži"
+        },
+        "it": {
+                "title": "Progetto non salvato",
+                "message": "Chiudere l’applicazione?",
+                "sub": "Se il progetto non è stato salvato, le modifiche andranno perse.",
+                "close": "Chiudi",
+                "cancel": "Annulla",
+                "minimize": "Riduci a icona",
+                "maximize": "Ingrandisci",
+                "restore": "Ripristina",
+                "search": "Cerca"
+        },
+        "ro": {
+                "title": "Proiect nesalvat",
+                "message": "Închideți aplicația?",
+                "sub": "Dacă proiectul nu este salvat, modificările vor fi pierdute.",
+                "close": "Închide",
+                "cancel": "Anulează",
+                "minimize": "Minimizează",
+                "maximize": "Maximizează",
+                "restore": "Restabilește",
+                "search": "Caută"
+        },
+        "nl": {
+                "title": "Niet-opgeslagen project",
+                "message": "Applicatie sluiten?",
+                "sub": "Als het project niet is opgeslagen, gaan de wijzigingen verloren.",
+                "close": "Sluiten",
+                "cancel": "Annuleren",
+                "minimize": "Minimaliseren",
+                "maximize": "Maximaliseren",
+                "restore": "Herstellen",
+                "search": "Zoeken"
+        },
+        "sv": {
+                "title": "Osparat projekt",
+                "message": "Stäng programmet?",
+                "sub": "Om projektet inte är sparat går ändringarna förlorade.",
+                "close": "Stäng",
+                "cancel": "Avbryt",
+                "minimize": "Minimera",
+                "maximize": "Maximera",
+                "restore": "Återställ",
+                "search": "Sök"
+        },
+        "da": {
+                "title": "Ikke gemt projekt",
+                "message": "Luk programmet?",
+                "sub": "Hvis projektet ikke er gemt, går ændringerne tabt.",
+                "close": "Luk",
+                "cancel": "Annuller",
+                "minimize": "Minimer",
+                "maximize": "Maksimer",
+                "restore": "Gendan",
+                "search": "Søg"
+        },
+        "fi": {
+                "title": "Tallentamaton projekti",
+                "message": "Suljetaanko sovellus?",
+                "sub": "Jos projektia ei ole tallennettu, muutokset menetetään.",
+                "close": "Sulje",
+                "cancel": "Peruuta",
+                "minimize": "Pienennä",
+                "maximize": "Suurenna",
+                "restore": "Palauta",
+                "search": "Haku"
+        },
+        "sl": {
+                "title": "Neshranjen projekt",
+                "message": "Zapreti aplikacijo?",
+                "sub": "Če projekt ni shranjen, bodo spremembe izgubljene.",
+                "close": "Zapri",
+                "cancel": "Prekliči",
+                "minimize": "Pomanjšaj",
+                "maximize": "Povečaj",
+                "restore": "Obnovi",
+                "search": "Iskanje"
+        },
+        "tr": {
+                "title": "Kaydedilmemiş proje",
+                "message": "Uygulama kapatılsın mı?",
+                "sub": "Proje kaydedilmediyse değişiklikler kaybolur.",
+                "close": "Kapat",
+                "cancel": "İptal",
+                "minimize": "Küçült",
+                "maximize": "Büyüt",
+                "restore": "Geri yükle",
+                "search": "Ara"
+        },
+        "pl": {
+                "title": "Niezapisany projekt",
+                "message": "Zamknąć aplikację?",
+                "sub": "Jeśli projekt nie został zapisany, zmiany zostaną utracone.",
+                "close": "Zamknij",
+                "cancel": "Anuluj",
+                "minimize": "Minimalizuj",
+                "maximize": "Maksymalizuj",
+                "restore": "Przywróć",
+                "search": "Szukaj"
+        },
+        "id": {
+                "title": "Proyek belum disimpan",
+                "message": "Tutup aplikasi?",
+                "sub": "Jika proyek belum disimpan, perubahan akan hilang.",
+                "close": "Tutup",
+                "cancel": "Batal",
+                "minimize": "Minimalkan",
+                "maximize": "Maksimalkan",
+                "restore": "Pulihkan",
+                "search": "Cari"
+        },
+        "zh-CN": {
+                "title": "未保存的项目",
+                "message": "关闭应用程序？",
+                "sub": "如果项目未保存，更改将会丢失。",
+                "close": "关闭",
+                "cancel": "取消",
+                "minimize": "最小化",
+                "maximize": "最大化",
+                "restore": "还原",
+                "search": "搜索"
+        },
+        "zh-CHT": {
+                "title": "未儲存的專案",
+                "message": "要關閉應用程式嗎？",
+                "sub": "如果專案尚未儲存，變更將會遺失。",
+                "close": "關閉",
+                "cancel": "取消",
+                "minimize": "最小化",
+                "maximize": "最大化",
+                "restore": "還原",
+                "search": "搜尋"
+        },
+        "th": {
+                "title": "โปรเจกต์ยังไม่ได้บันทึก",
+                "message": "ปิดแอปพลิเคชันหรือไม่?",
+                "sub": "หากยังไม่ได้บันทึกโปรเจกต์ การเปลี่ยนแปลงจะสูญหาย",
+                "close": "ปิด",
+                "cancel": "ยกเลิก",
+                "minimize": "ย่อ",
+                "maximize": "ขยาย",
+                "restore": "คืนค่า",
+                "search": "ค้นหา"
+        },
+        "ja": {
+                "title": "未保存のプロジェクト",
+                "message": "アプリケーションを閉じますか？",
+                "sub": "プロジェクトが保存されていない場合、変更は失われます。",
+                "close": "閉じる",
+                "cancel": "キャンセル",
+                "minimize": "最小化",
+                "maximize": "最大化",
+                "restore": "元に戻す",
+                "search": "検索"
+        },
+        "ko": {
+                "title": "저장되지 않은 프로젝트",
+                "message": "응용 프로그램을 닫으시겠습니까?",
+                "sub": "프로젝트가 저장되지 않은 경우 변경 사항이 손실됩니다.",
+                "close": "닫기",
+                "cancel": "취소",
+                "minimize": "최소화",
+                "maximize": "최대화",
+                "restore": "복원",
+                "search": "검색"
+        },
+        "pt-BR": {
+                "title": "Projeto não salvo",
+                "message": "Fechar o aplicativo?",
+                "sub": "Se o projeto não foi salvo, as alterações serão perdidas.",
+                "close": "Fechar",
+                "cancel": "Cancelar",
+                "minimize": "Minimizar",
+                "maximize": "Maximizar",
+                "restore": "Restaurar",
+                "search": "Pesquisar"
+        },
+        "hu": {
+                "title": "Nem mentett projekt",
+                "message": "Bezárja az alkalmazást?",
+                "sub": "Ha a projekt nincs mentve, a módosítások elvesznek.",
+                "close": "Bezárás",
+                "cancel": "Mégse",
+                "minimize": "Kis méret",
+                "maximize": "Teljes méret",
+                "restore": "Visszaállítás",
+                "search": "Keresés"
+        },
+        "sk": {
+                "title": "Neuložený projekt",
+                "message": "Zavrieť aplikáciu?",
+                "sub": "Ak projekt nie je uložený, zmeny sa stratia.",
+                "close": "Zavrieť",
+                "cancel": "Zrušiť",
+                "minimize": "Minimalizovať",
+                "maximize": "Maximalizovať",
+                "restore": "Obnoviť",
+                "search": "Hľadať"
+        },
+        "vi": {
+                "title": "Dự án chưa lưu",
+                "message": "Đóng ứng dụng?",
+                "sub": "Nếu dự án chưa được lưu, các thay đổi sẽ bị mất.",
+                "close": "Đóng",
+                "cancel": "Hủy",
+                "minimize": "Thu nhỏ",
+                "maximize": "Phóng to",
+                "restore": "Khôi phục",
+                "search": "Tìm kiếm"
+        },
+        "bg": {
+                "title": "Незапазен проект",
+                "message": "Да се затвори ли приложението?",
+                "sub": "Ако проектът не е запазен, промените ще бъдат изгубени.",
+                "close": "Затвори",
+                "cancel": "Отказ",
+                "minimize": "Минимизиране",
+                "maximize": "Максимизиране",
+                "restore": "Възстановяване",
+                "search": "Търсене"
+        },
+        "sr": {
+                "title": "Несачуван пројекат",
+                "message": "Затворити апликацију?",
+                "sub": "Ако пројекат није сачуван, измене ће бити изгубљене.",
+                "close": "Затвори",
+                "cancel": "Откажи",
+                "minimize": "Умањи",
+                "maximize": "Увећај",
+                "restore": "Врати",
+                "search": "Претрага"
+        },
+        "sq": {
+                "title": "Projekt i paruajtur",
+                "message": "Të mbyllet aplikacioni?",
+                "sub": "Nëse projekti nuk është ruajtur, ndryshimet do të humbasin.",
+                "close": "Mbyll",
+                "cancel": "Anulo",
+                "minimize": "Minimizo",
+                "maximize": "Maksimizo",
+                "restore": "Rikthe",
+                "search": "Kërko"
+        },
+        "ta": {
+                "title": "சேமிக்கப்படாத திட்டம்",
+                "message": "பயன்பாட்டை மூடவா?",
+                "sub": "திட்டம் சேமிக்கப்படவில்லை என்றால், மாற்றங்கள் இழக்கப்படும்.",
+                "close": "மூடு",
+                "cancel": "ரத்து",
+                "minimize": "சிறிதாக்கு",
+                "maximize": "பெரிதாக்கு",
+                "restore": "மீட்டமை",
+                "search": "தேடு"
+        },
+        "bo": {
+                "title": "ཉར་མེད་པའི་ལས་འཆར།",
+                "message": "ཉེར་སྤྱོད་སྒོ་རྒྱག་གམ།",
+                "sub": "ལས་འཆར་ཉར་མེད་ན་བཟོ་བཅོས་རྣམས་བརླག་འགྲོ།",
+                "close": "སྒོ་རྒྱག",
+                "cancel": "དོར",
+                "minimize": "ཆུང་བ",
+                "maximize": "ཆེ་བ",
+                "restore": "སོར་ཆུད",
+                "search": "འཚོལ"
+        },
+        "ca": {
+                "title": "Projecte no desat",
+                "message": "Tancar l’aplicació?",
+                "sub": "Si el projecte no està desat, els canvis es perdran.",
+                "close": "Tanca",
+                "cancel": "Cancel·la",
+                "minimize": "Minimitza",
+                "maximize": "Maximitza",
+                "restore": "Restaura",
+                "search": "Cerca"
+        },
+        "no": {
+                "title": "Ulagret prosjekt",
+                "message": "Lukke programmet?",
+                "sub": "Hvis prosjektet ikke er lagret, går endringene tapt.",
+                "close": "Lukk",
+                "cancel": "Avbryt",
+                "minimize": "Minimer",
+                "maximize": "Maksimer",
+                "restore": "Gjenopprett",
+                "search": "Søk"
+        },
+        "tl": {
+                "title": "Hindi na-save na proyekto",
+                "message": "Isara ang app?",
+                "sub": "Kung hindi na-save ang proyekto, mawawala ang mga pagbabago.",
+                "close": "Isara",
+                "cancel": "Kanselahin",
+                "minimize": "I-minimize",
+                "maximize": "I-maximize",
+                "restore": "Ibalik",
+                "search": "Hanapin"
+        },
+        "et": {
+                "title": "Salvestamata projekt",
+                "message": "Kas sulgeda rakendus?",
+                "sub": "Kui projekt pole salvestatud, lähevad muudatused kaotsi.",
+                "close": "Sulge",
+                "cancel": "Tühista",
+                "minimize": "Minimeeri",
+                "maximize": "Maksimeeri",
+                "restore": "Taasta",
+                "search": "Otsi"
+        },
+        "lt": {
+                "title": "Neišsaugotas projektas",
+                "message": "Uždaryti programą?",
+                "sub": "Jei projektas neišsaugotas, pakeitimai bus prarasti.",
+                "close": "Uždaryti",
+                "cancel": "Atšaukti",
+                "minimize": "Sumažinti",
+                "maximize": "Padidinti",
+                "restore": "Atkurti",
+                "search": "Ieškoti"
+        },
+        "ckb": {
+                "title": "پڕۆژەی پاشەکەوت‌نەکراو",
+                "message": "بەرنامە دابخرێت؟",
+                "sub": "ئەگەر پڕۆژەکە پاشەکەوت نەکرابێت، گۆڕانکارییەکان لەدەست دەچن.",
+                "close": "داخستن",
+                "cancel": "هەڵوەشاندنەوە",
+                "minimize": "بچووککردنەوە",
+                "maximize": "گەورەکردن",
+                "restore": "گەڕاندنەوە",
+                "search": "گەڕان"
+        },
+        "fa": {
+                "title": "پروژه ذخیره‌نشده",
+                "message": "برنامه بسته شود؟",
+                "sub": "اگر پروژه ذخیره نشده باشد، تغییرات از دست خواهند رفت.",
+                "close": "بستن",
+                "cancel": "لغو",
+                "minimize": "کوچک کردن",
+                "maximize": "بزرگ کردن",
+                "restore": "بازگردانی",
+                "search": "جستجو"
+        },
+        "eo": {
+                "title": "Nekonservita projekto",
+                "message": "Ĉu fermi la aplikaĵon?",
+                "sub": "Se la projekto ne estas konservita, ŝanĝoj perdiĝos.",
+                "close": "Fermi",
+                "cancel": "Nuligi",
+                "minimize": "Minimumigi",
+                "maximize": "Maksimumigi",
+                "restore": "Restarigi",
+                "search": "Serĉi"
+        },
+        "nqo": {
+                "title": "ߞߊ߬ ߓߘߐ߬ߓߌ߬ߟߊ߬ ߕߊ߬ ߓߊ߯ߙߊ",
+                "message": "ߓߊ߯ߙߊߟߊ߲ ߘߊߕߎ߲߯؟",
+                "sub": "ߣߴߊ߬ ߡߊ߫ ߟߊߞߎ߲߬ߘߎ߬ ߘߐ߫، ߝߊ߬ߟߋ߲߬ߠߌ ߟߎ߬ ߦߋ߫ ߕߎߣߎ߲߫.",
+                "close": "ߘߊߕߎ߲߯",
+                "cancel": "ߓߐ߬ߛߌ߬",
+                "minimize": "ߘߐ߰ߦߊ߬",
+                "maximize": "ߓߏ߲߬ߧߊ߬",
+                "restore": "ߟߊߛߊ߬ߦߌ߬",
+                "search": "ߢߌߣߌ߲"
+        },
+        "ka": {
+                "title": "შეუნახავი პროექტი",
+                "message": "დაიხუროს აპლიკაცია?",
+                "sub": "თუ პროექტი შენახული არ არის, ცვლილებები დაიკარგება.",
+                "close": "დახურვა",
+                "cancel": "გაუქმება",
+                "minimize": "ჩაკეცვა",
+                "maximize": "გადიდება",
+                "restore": "აღდგენა",
+                "search": "ძებნა"
+        },
+        "kk": {
+                "title": "Сақталмаған жоба",
+                "message": "Қолданбаны жабу керек пе?",
+                "sub": "Егер жоба сақталмаса, өзгерістер жоғалады.",
+                "close": "Жабу",
+                "cancel": "Бас тарту",
+                "minimize": "Қайыру",
+                "maximize": "Үлкейту",
+                "restore": "Қалпына келтіру",
+                "search": "Іздеу"
+        },
+        "rue": {
+                "title": "Неуложеный проєкт",
+                "message": "Закрыти аплікацію?",
+                "sub": "Кедь проєкт не є уложеный, зміны ся стратять.",
+                "close": "Закрыти",
+                "cancel": "Одкликати",
+                "minimize": "Зменшыти",
+                "maximize": "Звекшыти",
+                "restore": "Вернути",
+                "search": "Пошук"
+        }
+};
+    var DESKTOP_MENU_SIGNATURES = {
+        "en": [
+                "File",
+                "Edit",
+                "Image"
+        ],
+        "cs": [
+                "Soubor",
+                "Úpravy",
+                "Obraz"
+        ],
+        "es": [
+                "Archivo",
+                "Editar",
+                "Imagen"
+        ],
+        "de": [
+                "Datei",
+                "Bearbeiten",
+                "Bild"
+        ],
+        "fr": [
+                "Fichier",
+                "Édition",
+                "Image"
+        ],
+        "el": [
+                "Αρχείο",
+                "Επεξεργασία",
+                "Εικόνα"
+        ],
+        "ar": [
+                "ملف",
+                "تعديل",
+                "صورة"
+        ],
+        "pt": [
+                "Arquivo",
+                "Editar",
+                "Imagem"
+        ],
+        "ru": [
+                "Файл",
+                "Редактирование",
+                "Изображение"
+        ],
+        "uk": [
+                "Файл",
+                "Редагувати",
+                "Зображення"
+        ],
+        "he": [
+                "קובץ",
+                "עריכה",
+                "תמונה"
+        ],
+        "hr": [
+                "Datoteka",
+                "Uređivanje",
+                "Slika"
+        ],
+        "it": [
+                "File",
+                "Modifica",
+                "Immagine"
+        ],
+        "ro": [
+                "Fișier",
+                "Editare",
+                "Imagine"
+        ],
+        "nl": [
+                "Bestand",
+                "Bewerken",
+                "Afbeelding"
+        ],
+        "sv": [
+                "Fil",
+                "Redigera",
+                "Bild"
+        ],
+        "da": [
+                "Fil",
+                "Rediger",
+                "Billede"
+        ],
+        "fi": [
+                "Tiedosto",
+                "Muokkaa",
+                "Kuva"
+        ],
+        "sl": [
+                "Datoteka",
+                "Uredi",
+                "Slika"
+        ],
+        "tr": [
+                "Dosya",
+                "Düzenle",
+                "Resim"
+        ],
+        "pl": [
+                "Plik",
+                "Edycja",
+                "Obraz"
+        ],
+        "id": [
+                "Berkas",
+                "Ubah",
+                "Gambar"
+        ],
+        "zh-CN": [
+                "文件",
+                " 编辑",
+                " 图像"
+        ],
+        "zh-CHT": [
+                "檔案",
+                "編輯",
+                "影像"
+        ],
+        "th": [
+                "ไฟล์",
+                "แก้ไข",
+                "รูปภาพ"
+        ],
+        "ja": [
+                "ファイル",
+                "編集",
+                "画像"
+        ],
+        "ko": [
+                "파일",
+                "편집",
+                "이미지"
+        ],
+        "pt-BR": [
+                "Arquivo",
+                "Editar",
+                "Imagem"
+        ],
+        "hu": [
+                "Fájl",
+                "Szerkesztés",
+                "Kép"
+        ],
+        "sk": [
+                "Súbor",
+                "Upraviť",
+                "Obraz"
+        ],
+        "vi": [
+                "Tệp",
+                "Chỉnh sửa",
+                "Hình ảnh"
+        ],
+        "bg": [
+                "Файл",
+                "Редакция",
+                "Изображение"
+        ],
+        "sr": [
+                "Датотека",
+                "Измени",
+                "Слика"
+        ],
+        "sq": [
+                "Dokumenti",
+                "Redakto",
+                "Foto"
+        ],
+        "ta": [
+                "கோப்பு",
+                "தொகு",
+                "படம்"
+        ],
+        "bo": [
+                "ཡིག་ཆ།",
+                "བཟོ་སྒྲིག",
+                "པར།"
+        ],
+        "ca": [
+                "Fitxer",
+                "Edita",
+                "Imatge"
+        ],
+        "no": [
+                "Fil",
+                "Rediger",
+                "Bilde"
+        ],
+        "tl": [
+                "File",
+                "I-edit",
+                "Larawan"
+        ],
+        "et": [
+                "Fail",
+                "Muuda",
+                "Pilt"
+        ],
+        "lt": [
+                "Failas",
+                "Redaguoti",
+                "Vaizdas"
+        ],
+        "ckb": [
+                "پەڕاو",
+                "دەستکاری",
+                "وێنە"
+        ],
+        "fa": [
+                "فایل",
+                "ویرایش",
+                "تصویر"
+        ],
+        "eo": [
+                "Dosiero",
+                "Redakti",
+                "Bildo"
+        ],
+        "nqo": [
+                "ߞߐߕߐ߮",
+                "ߟߢߊ߬ߟߌ",
+                "ߖߌ߬ߦߊ߬ߓߍ"
+        ],
+        "ka": [
+                "ფაილი",
+                "რედაქტირება",
+                "სურათი"
+        ],
+        "kk": [
+                "Файл",
+                "Өңдеу",
+                "Сурет"
+        ],
+        "rue": [
+                "Файл",
+                "Редаґовати",
+                "Образчик"
+        ]
+};
+    var DESKTOP_RTL_CODES = { ar: true, he: true, fa: true, ckb: true, nqo: true };
+
+    function desktopNormalizeInitialLanguage(code) {
+        code = String(code == null ? '' : code).replace(/_/g, '-').trim();
+        if (!code) return null;
+        var lower = code.toLowerCase();
+        var aliases = {
+            'zh-hk': 'zh-CHT',
+            'zh-tw': 'zh-CHT',
+            'zh-mo': 'zh-CHT',
+            'zh-hant': 'zh-CHT',
+            'zh-cn': 'zh-CN',
+            'zh-sg': 'zh-CN',
+            'zh-hans': 'zh-CN',
+            'pt-br': 'pt-BR',
+            'nb': 'no',
+            'nn': 'no',
+            'nb-no': 'no',
+            'nn-no': 'no',
+            'fa-ir': 'fa',
+            'ku': 'ckb',
+            'ku-iq': 'ckb',
+            'ckb-iq': 'ckb'
+        };
+        if (aliases[lower] && DESKTOP_TRANSLATIONS[aliases[lower]]) return aliases[lower];
+        if (DESKTOP_TRANSLATIONS[code]) return code;
+        if (DESKTOP_TRANSLATIONS[lower]) return lower;
+        var base = lower.split('-')[0];
+        return DESKTOP_TRANSLATIONS[base] ? base : null;
+    }
+
+    function desktopReadQueryLanguage() {
+        try {
+            var params = new URLSearchParams(location.search || '');
+            return desktopNormalizeInitialLanguage(params.get('desktopLang'));
+        } catch (_ignored) {
+            return null;
+        }
+    }
+
+    var DESKTOP_SYSTEM_LANG = desktopReadQueryLanguage() || desktopNormalizeInitialLanguage((navigator.languages && navigator.languages[0]) || navigator.language) || 'en';
+    var DESKTOP_LAST_REPORTED_LANG = null;
+
     try {
-        if (!localStorage.getItem('lang')) localStorage.setItem('lang', 'ru');
+        if (!localStorage.getItem('lang') && !localStorage.getItem('_ppp')) {
+            localStorage.setItem('lang', DESKTOP_SYSTEM_LANG);
+        }
     } catch (_ignored) { }
+
+    try {
+        window.chrome.i18n.getUILanguage = function () { return DESKTOP_SYSTEM_LANG; };
+    } catch (_ignored2) { }
+
+    function desktopNormalizeText(value) {
+        return String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+    }
+
+    function desktopReadStoredLanguage() {
+        function isKnown(code) { return !!(code && DESKTOP_TRANSLATIONS[code]); }
+        function normalizeCode(code) {
+            code = desktopNormalizeText(code);
+            if (isKnown(code)) return code;
+            var lower = code.toLowerCase();
+            var aliases = { 'zh-hk': 'zh-CHT', 'zh-tw': 'zh-CHT', 'zh-mo': 'zh-CHT', 'zh-cn': 'zh-CN', 'pt-br': 'pt-BR' };
+            if (aliases[lower]) return aliases[lower];
+            if (isKnown(lower)) return lower;
+            var base = lower.split('-')[0];
+            return isKnown(base) ? base : null;
+        }
+        function scan(value, depth) {
+            if (depth > 4 || value == null) return null;
+            if (typeof value === 'string') {
+                var direct = normalizeCode(value);
+                if (direct) return direct;
+                if ((value.charAt(0) === '{' || value.charAt(0) === '[') && value.length < 20000) {
+                    try { return scan(JSON.parse(value), depth + 1); } catch (_ignored) { }
+                }
+                return null;
+            }
+            if (typeof value !== 'object') return null;
+            if (typeof value.lang === 'string') {
+                var lang = normalizeCode(value.lang);
+                if (lang) return lang;
+            }
+            if (value.globals && typeof value.globals.lang === 'string') {
+                var globalLang = normalizeCode(value.globals.lang);
+                if (globalLang) return globalLang;
+            }
+            var keys = Object.keys(value);
+            for (var i = 0; i < keys.length; i++) {
+                var found = scan(value[keys[i]], depth + 1);
+                if (found) return found;
+            }
+            return null;
+        }
+        try {
+            if (window.locStor) {
+                var state = window.locStor.getItem('0_stateLocal');
+                var fromLocState = scan(state, 0);
+                if (fromLocState) return fromLocState;
+            }
+        } catch (_ignored) { }
+        try {
+            var packed = window.localStorage && window.localStorage.getItem('_ppp');
+            var fromPacked = scan(packed, 0);
+            if (fromPacked) return fromPacked;
+        } catch (_ignored2) { }
+        try {
+            var fromLocal = normalizeCode(window.localStorage && window.localStorage.getItem('lang'));
+            if (fromLocal) return fromLocal;
+        } catch (_ignored3) { }
+        return null;
+    }
+
+    function desktopGetTopbarLabels() {
+        var topbar = document.getElementById('ap-topbar');
+        if (!topbar) return [];
+        var labels = [];
+        var children = Array.prototype.slice.call(topbar.children || []);
+        for (var i = 0; i < children.length; i++) {
+            var child = children[i];
+            if (!child || child.id === 'ap-topbar-right' || child.id === 'desktop-window-controls') continue;
+            if (child.classList && child.classList.contains('desktop-window-controls')) continue;
+            var text = desktopNormalizeText(child.innerText || child.textContent || '');
+            if (!text || text.length > 32) continue;
+            labels.push(text);
+            if (labels.length >= 3) break;
+        }
+        return labels;
+    }
+
+    function desktopGetTopbarFullText() {
+        var topbar = document.getElementById('ap-topbar');
+        if (!topbar) return '';
+        return desktopNormalizeText(topbar.innerText || topbar.textContent || '');
+    }
+
+    function desktopSignatureMatchesFullText(signature, text) {
+        if (!signature || signature.length < 3 || !text) return false;
+        var position = 0;
+        for (var i = 0; i < 3; i++) {
+            var token = desktopNormalizeText(signature[i]);
+            if (!token) return false;
+            var found = text.indexOf(token, position);
+            if (found < 0) return false;
+
+            // The menu labels are always at the beginning of Photopea topbar.
+            // This prevents random matches inside other UI text.
+            if (i === 0 && found > 12) return false;
+            position = found + token.length;
+        }
+        return true;
+    }
+
+    function desktopDetectLanguageFromTopbar() {
+        var labels = desktopGetTopbarLabels();
+        if (labels.length >= 3) {
+            for (var code in DESKTOP_MENU_SIGNATURES) {
+                var sig = DESKTOP_MENU_SIGNATURES[code];
+                if (!sig || sig.length < 3) continue;
+                if (desktopNormalizeText(sig[0]) === labels[0] && desktopNormalizeText(sig[1]) === labels[1] && desktopNormalizeText(sig[2]) === labels[2]) {
+                    return code;
+                }
+            }
+        }
+
+        var fullText = desktopGetTopbarFullText();
+        if (fullText) {
+            for (var code2 in DESKTOP_MENU_SIGNATURES) {
+                if (desktopSignatureMatchesFullText(DESKTOP_MENU_SIGNATURES[code2], fullText)) {
+                    return code2;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    function desktopDetectLanguageCode() {
+        return desktopDetectLanguageFromTopbar() || desktopReadStoredLanguage() || DESKTOP_SYSTEM_LANG || 'en';
+    }
+
+    function desktopTexts() {
+        var code = desktopDetectLanguageCode();
+        return DESKTOP_TRANSLATIONS[code] || DESKTOP_TRANSLATIONS.en;
+    }
+
+    function desktopCurrentDirection() {
+        var code = desktopDetectLanguageCode();
+        return DESKTOP_RTL_CODES[code] ? 'rtl' : 'ltr';
+    }
 
     function postWindowMessage(message) {
         if (window.chrome && window.chrome.webview) {
             window.chrome.webview.postMessage(message);
         }
+    }
+
+    function notifyDesktopLanguageChanged() {
+        var code = desktopDetectLanguageCode();
+        if (!code || code === DESKTOP_LAST_REPORTED_LANG) return code;
+        DESKTOP_LAST_REPORTED_LANG = code;
+        postWindowMessage('window:language:' + code);
+        return code;
     }
 
     function isInteractiveTarget(target) {
@@ -285,6 +1253,29 @@
         return true;
     }
 
+
+    function updateWindowControlsLanguage() {
+        var controls = document.getElementById('desktop-window-controls');
+        if (!controls) return;
+        var t = desktopTexts();
+        var minButton = controls.querySelector('.desktop-window-minimize');
+        var maxButton = controls.querySelector('.desktop-window-maximize');
+        var closeButton = controls.querySelector('.desktop-window-close');
+        if (minButton) {
+            minButton.title = t.minimize;
+            minButton.setAttribute('aria-label', t.minimize);
+        }
+        if (maxButton) {
+            var maximized = document.documentElement.classList.contains('desktop-window-maximized');
+            maxButton.title = maximized ? t.restore : t.maximize;
+            maxButton.setAttribute('aria-label', maxButton.title);
+        }
+        if (closeButton) {
+            closeButton.title = t.close;
+            closeButton.setAttribute('aria-label', t.close);
+        }
+    }
+
     function installWindowControls() {
         installStyle();
         removeFullscreenButton();
@@ -303,13 +1294,14 @@
             var maximizeIcon = createSvg('0 0 18 18', ['M5 4.5H13.5V13H5Z']);
             var closeIcon = createSvg('0 0 18 18', ['M5 5L13 13', 'M13 5L5 13']);
 
-            var minButton = makeButton('desktop-window-minimize', 'Свернуть', minimizeIcon, function () {
+            var desktopText = desktopTexts();
+            var minButton = makeButton('desktop-window-minimize', desktopText.minimize, minimizeIcon, function () {
                 postWindowMessage('window:minimize');
             });
-            var maxButton = makeButton('desktop-window-maximize', 'Развернуть', maximizeIcon, function () {
+            var maxButton = makeButton('desktop-window-maximize', desktopText.maximize, maximizeIcon, function () {
                 postWindowMessage('window:toggleMaximize');
             });
-            var closeButton = makeButton('desktop-window-close', 'Закрыть', closeIcon, function () {
+            var closeButton = makeButton('desktop-window-close', desktopText.close, closeIcon, function () {
                 postWindowMessage('window:close');
             });
 
@@ -320,13 +1312,15 @@
             window.desktopWindowStateChanged = function (maximized) {
                 controls.classList.toggle('is-maximized', !!maximized);
                 document.documentElement.classList.toggle('desktop-window-maximized', !!maximized);
-                maxButton.title = maximized ? 'Восстановить' : 'Развернуть';
+                var t = desktopTexts();
+                maxButton.title = maximized ? t.restore : t.maximize;
                 maxButton.setAttribute('aria-label', maxButton.title);
                 updateMaximizeIcon(maximizeIcon, !!maximized);
             };
         }
 
         if (controls.parentNode !== right) right.appendChild(controls);
+        updateWindowControlsLanguage();
 
         right.style.padding = '0';
         right.style.height = '31px';
@@ -368,10 +1362,11 @@
         var searchButton = document.getElementById('ap-topbar-search');
         if (!searchButton) return false;
 
-        searchButton.title = 'Поиск';
-        searchButton.setAttribute('aria-label', 'Поиск');
+        var t = desktopTexts();
+        searchButton.title = t.search;
+        searchButton.setAttribute('aria-label', t.search);
         var img = searchButton.querySelector('img');
-        if (img) img.alt = 'Поиск';
+        if (img) img.alt = t.search;
 
         if (!searchButton.__desktopSearchFixed) {
             searchButton.__desktopSearchFixed = true;
@@ -392,20 +1387,49 @@
         if (sendCancelMessage) postWindowMessage('window:closeCanceled');
     }
 
+    function updateUnsavedProjectDialogLanguage() {
+        var overlay = document.getElementById('desktop-close-dialog-overlay');
+        if (!overlay) return;
+        var dialog = overlay.querySelector('.desktop-close-dialog');
+        if (!dialog) return;
+
+        var t = desktopTexts();
+        dialog.setAttribute('aria-label', t.title);
+        dialog.setAttribute('dir', desktopCurrentDirection());
+
+        var title = dialog.querySelector('.wname');
+        var cross = dialog.querySelector('.cross');
+        var message = dialog.querySelector('.desktop-close-dialog-message');
+        var sub = dialog.querySelector('.desktop-close-dialog-sub');
+        var buttons = dialog.querySelectorAll('.desktop-close-dialog-actions .bbtn');
+
+        if (title) title.textContent = t.title;
+        if (cross) {
+            cross.title = t.close;
+            cross.setAttribute('aria-label', t.close);
+        }
+        if (message) message.textContent = t.message;
+        if (sub) sub.textContent = t.sub;
+        if (buttons[0]) buttons[0].textContent = t.close;
+        if (buttons[1]) buttons[1].textContent = t.cancel;
+    }
+
     function showUnsavedProjectDialog() {
         installStyle();
 
-        if (document.getElementById('desktop-close-dialog-overlay')) return;
+        if (document.getElementById('desktop-close-dialog-overlay')) { updateUnsavedProjectDialogLanguage(); return; }
 
         var overlay = document.createElement('div');
         overlay.id = 'desktop-close-dialog-overlay';
         overlay.className = 'desktop-close-dialog-overlay';
 
+        var t = desktopTexts();
         var dialog = document.createElement('div');
         dialog.className = 'window desktop-close-dialog';
         dialog.setAttribute('role', 'dialog');
         dialog.setAttribute('aria-modal', 'true');
-        dialog.setAttribute('aria-label', 'Несохранённый проект');
+        dialog.setAttribute('aria-label', t.title);
+        dialog.setAttribute('dir', desktopCurrentDirection());
         overlay.appendChild(dialog);
 
         var head = document.createElement('div');
@@ -414,13 +1438,13 @@
 
         var name = document.createElement('div');
         name.className = 'wname';
-        name.textContent = 'Несохранённый проект';
+        name.textContent = t.title;
         head.appendChild(name);
 
         var cross = document.createElement('div');
         cross.className = 'cross';
-        cross.title = 'Закрыть';
-        cross.setAttribute('aria-label', 'Закрыть');
+        cross.title = t.close;
+        cross.setAttribute('aria-label', t.close);
         head.appendChild(cross);
 
         var body = document.createElement('div');
@@ -429,12 +1453,12 @@
 
         var message = document.createElement('div');
         message.className = 'desktop-close-dialog-message';
-        message.textContent = 'Закрыть приложение?';
+        message.textContent = t.message;
         body.appendChild(message);
 
         var sub = document.createElement('div');
         sub.className = 'desktop-close-dialog-sub';
-        sub.textContent = 'Если проект не сохранён, изменения будут потеряны.';
+        sub.textContent = t.sub;
         body.appendChild(sub);
 
         var actions = document.createElement('div');
@@ -444,13 +1468,13 @@
         var closeButton = document.createElement('button');
         closeButton.type = 'button';
         closeButton.className = 'bbtn';
-        closeButton.textContent = 'Закрыть';
+        closeButton.textContent = t.close;
         actions.appendChild(closeButton);
 
         var cancelButton = document.createElement('button');
         cancelButton.type = 'button';
         cancelButton.className = 'bbtn';
-        cancelButton.textContent = 'Отмена';
+        cancelButton.textContent = t.cancel;
         actions.appendChild(cancelButton);
 
         function cancel(event) {
@@ -603,7 +1627,9 @@
         installWindowControls();
         installResizeHandles();
         fixTopbarSearchButton();
+        updateUnsavedProjectDialogLanguage();
         hideHomeBottomImage();
+        notifyDesktopLanguageChanged();
     }
 
     function scheduleEnsure() {
