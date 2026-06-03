@@ -1,0 +1,2 @@
+(function(){chrome.action.onClicked.addListener((()=>{chrome.runtime.openOptionsPage()})),chrome.runtime.onInstalled.addListener((()=>{})),chrome.runtime.onUpdateAvailable.addListener((()=>{})),chrome.runtime.onMessage.addListener(((e,n,t)=>{"new_image"===e.type&&chrome.tabs.query({active:!0,currentWindow:!0},(function(n){n[0]&&chrome.tabs.sendMessage(n[0].id,e)}))}))})();
+//# sourceMappingURL=background.js.map

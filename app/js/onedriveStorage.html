@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<!--
+  onedriveStorage.html  —  кастомный OneDrive-бридж для Photopea
+  ──────────────────────────────────────────────────────────────
+  НАСТРОЙКА:
+    1. Зарегистрируй Azure-приложение (бесплатно):
+       https://portal.azure.com  →  App registrations  →  New registration
+         · Name: что угодно
+         · Account types: "Personal Microsoft accounts only"
+         · Redirect URI: Web → URL этого файла (например http://localhost:8080/onedriveStorage.html)
+       После создания скопируй "Application (client) ID"
+
+    2. В разделе "Authentication" включи:
+       ✅  Access tokens (implicit grant)  ← НЕ нужно, мы используем PKCE
+       ✅  Allow public client flows
+
+    3. Вставь CLIENT_ID ниже.
+-->
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<script>
+"use strict";
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║                   КОНФИГУРАЦИЯ                           ║
+// ╚══════════════════════════════════════════════════════════╝
+const CLIENT_ID   = "ВСТАВЬ_AZURE_CLIENT_ID_СЮДА";
+const SCOPES      = "https://graph.microsoft.com/Files.ReadWrite " +
+                    "https://graph.microsoft.com/User.Read offline_access";
+const REDIRECT_URI = (() => {
+  // Адрес этого файла без хэша/параметров — должен совпадать с Azure
+  return location.origin + location.pathname;
+})();
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║               Хранение токена                            ║
+// ╚══════════════════════════════════════════════════════════╝
+const LS_KEY = "pp_onedrive_token";
+
+function tokenSave(t)  { try { localStorage.setItem(LS_KEY, JSON.stringify(t)); } catch {} }
+function tokenLoad()   { try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; } }
+function tokenClear()  { try { localStorage.removeItem(LS_KEY); } catch {} }
+
+let _tok = tokenLoad();   // { access_token, refresh_token, expires_at }
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║               OAuth 2.0 + PKCE                           ║
+// ╚══════════════════════════════════════════════════════════╝
+function b64url(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+async function makePKCE() {
+  const verifier  = b64url(crypto.getRandomValues(new Uint8Array(32)));
+  const hashBuf   = await crypto.subtle.digest("SHA-256",
+                      new TextEncoder().encode(verifier));
+  return { verifier, challenge: b64url(hashBuf) };
+}
+
+// Открывает popup → ждёт редиректа обратно на эту страницу → меняет code на token
+async function loginPopup() {
+  const { verifier, challenge } = await makePKCE();
+  const state = Math.random().toString(36).slice(2);
+  sessionStorage.setItem("od_verifier", verifier);
+  sessionStorage.setItem("od_state",    state);
+
+  const params = new URLSearchParams({
+    client_id:             CLIENT_ID,
+    response_type:         "code",
+    redirect_uri:          REDIRECT_URI,
+    response_mode:         "query",
+    scope:                 SCOPES,
+    state,
+    code_challenge:        challenge,
+    code_challenge_method: "S256",
+  });
+  const authUrl = "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?" + params;
+
+  return new Promise((resolve, reject) => {
+    const popup = window.open(authUrl, "mslogin",
+      "width=520,height=660,menubar=no,toolbar=no,location=yes");
+
+    if (!popup) { reject(new Error("Popups blocked — разреши всплывающие окна")); return; }
+
+    // Ждём сообщение от popup-редиректа
+    function onMsg(e) {
+      if (!e.data || e.data.type !== "od_code") return;
+      cleanup();
+      if (e.data.state !== state) { reject(new Error("OAuth state mismatch")); return; }
+      exchangeCode(e.data.code, verifier).then(resolve, reject);
+    }
+    function onTimer() {
+      if (popup.closed) { cleanup(); reject(new Error("Вход отменён")); }
+    }
+    const timer = setInterval(onTimer, 500);
+    window.addEventListener("message", onMsg);
+    function cleanup() { clearInterval(timer); window.removeEventListener("message", onMsg); }
+  });
+}
+
+async function exchangeCode(code, verifier) {
+  const resp = await fetch(
+    "https://login.microsoftonline.com/consumers/oauth2/v2.0/token",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id:     CLIENT_ID,
+        grant_type:    "authorization_code",
+        code,
+        redirect_uri:  REDIRECT_URI,
+        code_verifier: verifier,
+        scope:         SCOPES,
+      }),
+    }
+  );
+  if (!resp.ok) throw new Error("Token exchange failed: " + await resp.text());
+  const tok = await resp.json();
+  tok.expires_at = Date.now() + tok.expires_in * 1000;
+  tokenSave(tok);
+  _tok = tok;
+  return tok;
+}
+
+async function refreshTokens() {
+  if (!_tok?.refresh_token) throw new Error("Нет refresh_token, нужен повторный вход");
+  const resp = await fetch(
+    "https://login.microsoftonline.com/consumers/oauth2/v2.0/token",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id:     CLIENT_ID,
+        grant_type:    "refresh_token",
+        refresh_token: _tok.refresh_token,
+        scope:         SCOPES,
+      }),
+    }
+  );
+  if (!resp.ok) throw new Error("Refresh failed: " + await resp.text());
+  const tok = await resp.json();
+  tok.expires_at = Date.now() + tok.expires_in * 1000;
+  tokenSave(tok);
+  _tok = tok;
+  return tok;
+}
+
+// Возвращает действующий access_token. interactive=true → открывает popup если надо.
+async function getToken(interactive = false) {
+  if (_tok) {
+    if (Date.now() < _tok.expires_at - 60_000) return _tok.access_token;
+    try { return (await refreshTokens()).access_token; } catch { _tok = null; tokenClear(); }
+  }
+  if (!interactive) return null;
+  return (await loginPopup()).access_token;
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║            Microsoft Graph API                           ║
+// ╚══════════════════════════════════════════════════════════╝
+const GRAPH = "https://graph.microsoft.com/v1.0";
+
+async function graph(method, endpoint, body = null, binary = false) {
+  const token = await getToken();
+  const headers = { Authorization: "Bearer " + token };
+  const opts    = { method, headers };
+
+  if (body instanceof ArrayBuffer) {
+    opts.body    = body;
+    headers["Content-Type"] = "application/octet-stream";
+  } else if (body !== null) {
+    opts.body    = JSON.stringify(body);
+    headers["Content-Type"] = "application/json";
+  }
+
+  const res = await fetch(GRAPH + endpoint, opts);
+  if (res.status === 204) return null;
+  if (!res.ok) throw new Error(`Graph ${method} ${endpoint} → ${res.status}: ${await res.text()}`);
+  return binary ? res.arrayBuffer() : res.json();
+}
+
+// Конвертируем путь Photopea в Graph endpoint
+// ppPath всегда начинается с "/" → "/" это корень, "/folder/file.psd" — файл
+function ep(ppPath, suffix = "") {
+  const p = ppPath.replace(/^\/+/, "").replace(/\/+$/, "");
+  if (!p) return `/me/drive/root${suffix || "/children"}`;
+  // suffix="" → item  |  "/children" → дочерние  |  ":/content" → содержимое
+  return `/me/drive/root:/${p}${suffix ? ":" + suffix : ""}`;
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║            Обработчики команд Photopea                   ║
+// ╚══════════════════════════════════════════════════════════╝
+
+// show  → список файлов папки
+async function cmdShow(path) {
+  // Если токена нет — инициируем вход через popup
+  if (!await getToken()) await getToken(true);
+
+  const url     = ep(path, "/children") + "?$select=name,size,lastModifiedDateTime,folder";
+  const data    = await graph("GET", url);
+  const fileList = (data.value || []).map(it => [
+    it.name,
+    it.folder ? -1 : (it.size || 0),
+    Math.floor(new Date(it.lastModifiedDateTime).getTime() / 1000),
+    null   // thumbnail — можно добавить позже через $expand=thumbnails
+  ]);
+  reply("0", fileList);
+}
+
+// load  → скачать файл (ответ — бинарный ArrayBuffer)
+async function cmdLoad(path) {
+  const token = await getToken();
+  const url   = GRAPH + ep(path, ":/content");
+  const res   = await fetch(url, { headers: { Authorization: "Bearer " + token } });
+  if (!res.ok) throw new Error("Load failed: " + await res.text());
+  const buf = await res.arrayBuffer();
+  parent.postMessage(buf, "*");  // бинарный ответ без JSON-обёртки
+}
+
+// save (файл)  → загрузить ArrayBuffer на OneDrive
+async function cmdSaveFile(path, buffer) {
+  if (buffer.byteLength <= 4 * 1024 * 1024) {
+    // Простая загрузка до 4 МБ
+    await graph("PUT", ep(path, ":/content"), buffer);
+  } else {
+    // Большой файл — upload session
+    const session = await graph("POST", ep(path, ":/createUploadSession"), {
+      item: { "@microsoft.graph.conflictBehavior": "replace" }
+    });
+    const CHUNK = 10 * 1024 * 1024;  // 10 МБ
+    let offset  = 0;
+    while (offset < buffer.byteLength) {
+      const end   = Math.min(offset + CHUNK, buffer.byteLength);
+      const chunk = buffer.slice(offset, end);
+      const r     = await fetch(session.uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Length": String(chunk.byteLength),
+          "Content-Range":  `bytes ${offset}-${end - 1}/${buffer.byteLength}`,
+        },
+        body: chunk,
+      });
+      if (!r.ok && r.status !== 202) throw new Error("Chunk upload failed: " + await r.text());
+      offset = end;
+    }
+  }
+  reply("0", null);
+}
+
+// save (папка)  → создать новую папку (путь заканчивается на "/")
+async function cmdCreateFolder(path) {
+  const clean  = path.replace(/\/+$/, "");
+  const slash  = clean.lastIndexOf("/");
+  const parent = clean.slice(0, slash) || "/";
+  const name   = clean.slice(slash + 1);
+
+  await graph("POST", ep(parent, "/children"), {
+    name,
+    folder: {},
+    "@microsoft.graph.conflictBehavior": "rename",
+  });
+  reply("0", null);
+}
+
+// delete  → удалить файл/папку
+async function cmdDelete(path) {
+  await graph("DELETE", ep(path));
+  reply("0", null);
+}
+
+// rename  → переименовать.  prm = "/path/oldname.psd:newname.psd"
+async function cmdRename(prm) {
+  const colon   = prm.lastIndexOf(":");
+  const oldPath = prm.slice(0, colon);
+  const newName = prm.slice(colon + 1);
+  await graph("PATCH", ep(oldPath), { name: newName });
+  reply("0", null);
+}
+
+// forget  → выйти из аккаунта
+function cmdForget() {
+  tokenClear();
+  _tok = null;
+  reply("0", null);
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║   Маршрутизатор сообщений от Photopea                    ║
+// ╚══════════════════════════════════════════════════════════╝
+let _pendingSavePath = null;  // путь для следующего бинарного сообщения
+
+window.addEventListener("message", async (e) => {
+  // Игнорируем сообщения из popup-окна (od_code обрабатывается в loginPopup)
+  if (e.data?.type === "od_code") return;
+
+  // Бинарный ArrayBuffer — данные файла для сохранения
+  if (e.data instanceof ArrayBuffer) {
+    if (!_pendingSavePath) return;
+    const path        = _pendingSavePath;
+    _pendingSavePath  = null;
+    try   { await cmdSaveFile(path, e.data); }
+    catch (err) { reply("err", err.message); }
+    return;
+  }
+
+  // Строка — JSON-команда от Photopea
+  if (typeof e.data !== "string") return;
+  let msg;
+  try { msg = JSON.parse(e.data); } catch { return; }
+
+  const { code, prm } = msg;
+  try {
+    switch (code) {
+      case "show":   await cmdShow(prm);   break;
+      case "load":   await cmdLoad(prm);   break;
+      case "save":
+        if (prm.endsWith("/")) { await cmdCreateFolder(prm); }
+        else { _pendingSavePath = prm; /* ждём ArrayBuffer */ }
+        break;
+      case "delete": await cmdDelete(prm); break;
+      case "rename": await cmdRename(prm); break;
+      case "forget": cmdForget();          break;
+    }
+  } catch (err) {
+    reply("err", err.message);
+  }
+});
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║   Редирект-хэндлер (этот файл открылся как popup)       ║
+// ╚══════════════════════════════════════════════════════════╝
+(function handleOAuthRedirect() {
+  const params = new URLSearchParams(location.search);
+  if (!params.has("code")) return;   // не редирект — обычная загрузка в iframe
+
+  const code  = params.get("code");
+  const state = params.get("state");
+
+  // Отправляем code в родительский iframe и закрываемся
+  if (window.opener) {
+    window.opener.postMessage({ type: "od_code", code, state }, "*");
+    window.close();
+  }
+})();
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║   Инициализация                                          ║
+// ╚══════════════════════════════════════════════════════════╝
+function reply(code, prm) {
+  parent.postMessage(JSON.stringify({ code, prm }), "*");
+}
+
+(async function init() {
+  // Если мы в popup-редиректе — не инициализируемся (handleOAuthRedirect закроет нас)
+  if (new URLSearchParams(location.search).has("code")) return;
+
+  const token = await getToken();
+  reply("ready", !!token);
+  // prm=true  → Photopea сразу покажет список файлов
+  // prm=false → Photopea покажет кнопку "Connect to OneDrive"
+})();
+</script>
+</body>
+</html>
