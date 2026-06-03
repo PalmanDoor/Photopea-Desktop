@@ -126,23 +126,32 @@ public partial class MainWindow : Window
         StateChanged += OnStateChanged;
         SizeChanged += OnSizeChanged;
         Closing += OnClosing;
+        ApplySplashOverlayLanguage();
         if (_startupSplash is null)
             StartSplashProgress();
         UpdateSplashMaximizeButton();
+    }
+
+    private void ApplySplashOverlayLanguage()
+    {
+        SplashMinimizeButton.ToolTip = DesktopLanguage.Text("Minimize");
+        SplashCloseButton.ToolTip = DesktopLanguage.Text("Close");
+        if (SplashStatusText is not null)
+            SplashStatusText.Text = DesktopLanguage.Text("StartingApplication");
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         try
         {
-            SetSplashStatus("Подготовка редактора...");
+            SetSplashStatus(DesktopLanguage.Text("PreparingEditor"));
             await InitializeEditorAsync();
             ResizeWebViewToWindow();
         }
         catch (Exception ex)
         {
             MessageBox.Show(
-                "Не удалось запустить приложение. Проверь, что установлен Microsoft Edge WebView2 Runtime.\n\n" + ex.Message,
+                DesktopLanguage.Text("RuntimeError") + "\n\n" + ex.Message,
                 "Web Photoshop Desktop",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -153,40 +162,40 @@ public partial class MainWindow : Window
 
     private async Task InitializeEditorAsync()
     {
-        SetSplashProgress(50, "Проверка основных файлов...");
+        SetSplashProgress(50, DesktopLanguage.Text("CheckingMainFiles"));
 
         string appRoot = System.IO.Path.Combine(AppContext.BaseDirectory, "app");
         string indexPath = System.IO.Path.Combine(appRoot, "index.html");
         string bridgePath = System.IO.Path.Combine(AppContext.BaseDirectory, "desktop", "desktop-bridge.js");
 
         if (!File.Exists(indexPath))
-            throw new FileNotFoundException("Не найден файл app\\index.html", indexPath);
+            throw new FileNotFoundException(DesktopLanguage.Text("MissingIndex"), indexPath);
 
         if (!File.Exists(bridgePath))
-            throw new FileNotFoundException("Не найден файл desktop\\desktop-bridge.js", bridgePath);
+            throw new FileNotFoundException(DesktopLanguage.Text("MissingBridge"), bridgePath);
 
         string userDataFolder = System.IO.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "WebPhotoshopDesktop",
-            "ProfileIntegritySplash");
+            "ProfileSystemLanguage");
 
         Directory.CreateDirectory(userDataFolder);
 
-        SetSplashProgress(58, "Создание профиля WebView2...");
+        SetSplashProgress(58, DesktopLanguage.Text("CreatingProfile"));
 
-        var options = new CoreWebView2EnvironmentOptions("--lang=ru-RU");
+        var options = new CoreWebView2EnvironmentOptions($"--lang={DesktopLanguage.WebViewLanguage}");
         var environment = await CoreWebView2Environment.CreateAsync(
             browserExecutableFolder: null,
             userDataFolder: userDataFolder,
             options: options);
 
-        SetSplashProgress(66, "Запуск WebView2...");
+        SetSplashProgress(66, DesktopLanguage.Text("StartingWebView"));
 
         await EditorWebView.EnsureCoreWebView2Async(environment);
         EditorWebView.ZoomFactor = 1.0;
 
         CoreWebView2 core = EditorWebView.CoreWebView2;
-        SetSplashProgress(74, "Подключение локальных ресурсов...");
+        SetSplashProgress(74, DesktopLanguage.Text("ConnectingLocalResources"));
 
         core.SetVirtualHostNameToFolderMapping(
             HostName,
@@ -206,7 +215,7 @@ public partial class MainWindow : Window
                 if (!args.IsSuccess)
                 {
                     MessageBox.Show(
-                        "Страница приложения не загрузилась: " + args.WebErrorStatus,
+                        DesktopLanguage.Format("PageLoadFailed", args.WebErrorStatus),
                         "Web Photoshop Desktop",
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
@@ -214,34 +223,34 @@ public partial class MainWindow : Window
                 }
 
                 await SendWindowStateAsync();
-                SetSplashProgress(92, "Ожидание готового интерфейса...");
+                SetSplashProgress(92, DesktopLanguage.Text("WaitingInterface"));
                 await WaitForEditorInterfaceAsync();
                 await DispatchEditorResizeAsync();
-                SetSplashProgress(100, "Готово");
+                SetSplashProgress(100, DesktopLanguage.Text("Ready"));
                 await HideSplashAsync();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Редактор открылся, но интерфейс не успел подготовиться.\n\n" + ex.Message,
+                    DesktopLanguage.Text("EditorPreparedWarning") + "\n\n" + ex.Message,
                     "Web Photoshop Desktop",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                SetSplashProgress(100, "Готово");
+                SetSplashProgress(100, DesktopLanguage.Text("Ready"));
                 await HideSplashAsync();
             }
         };
 
-        SetSplashProgress(82, "Подготовка bridge-скрипта...");
+        SetSplashProgress(82, DesktopLanguage.Text("PreparingBridge"));
 
         string bridgeScript = await File.ReadAllTextAsync(bridgePath);
         await core.AddScriptToExecuteOnDocumentCreatedAsync(bridgeScript);
 
-        SetSplashProgress(88, "Загрузка Photopea Offline в фоне...");
+        SetSplashProgress(88, DesktopLanguage.Text("LoadingPhotopea"));
 
         _webViewReady = true;
-        core.Navigate($"https://{HostName}/index.html?desktop=8887");
+        core.Navigate($"https://{HostName}/index.html?desktop=8887&desktopLang={Uri.EscapeDataString(DesktopLanguage.PhotopeaCode)}");
     }
 
     private async Task WaitForEditorInterfaceAsync()
@@ -284,7 +293,7 @@ public partial class MainWindow : Window
             await Task.Delay(140);
         }
 
-        throw new TimeoutException("Photopea Offline слишком долго готовит стартовый интерфейс.");
+        throw new TimeoutException(DesktopLanguage.Text("EditorReadyTimeout"));
     }
 
 
@@ -309,7 +318,7 @@ public partial class MainWindow : Window
         };
 
         _splashTimer.Start();
-        SetSplashProgress(8, "Запуск приложения...");
+        SetSplashProgress(8, DesktopLanguage.Text("StartingApplication"));
     }
 
 
@@ -358,7 +367,7 @@ public partial class MainWindow : Window
 
         bool maximized = WindowState == WindowState.Maximized;
         SplashMaximizeButton.Content = maximized ? "❐" : "□";
-        SplashMaximizeButton.ToolTip = maximized ? "Восстановить" : "Развернуть";
+        SplashMaximizeButton.ToolTip = maximized ? DesktopLanguage.Text("Restore") : DesktopLanguage.Text("Maximize");
     }
 
     private void SetSplashStatus(string text)
@@ -405,7 +414,7 @@ public partial class MainWindow : Window
 
         _splashTarget = 100;
         _splashProgress = 100;
-        _startupSplash?.SetProgress(100, "Готово");
+        _startupSplash?.SetProgress(100, DesktopLanguage.Text("Ready"));
         ApplySplashProgress();
 
         await Task.Delay(220);
@@ -586,6 +595,15 @@ public partial class MainWindow : Window
     private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
         string message = e.TryGetWebMessageAsString();
+
+        const string languagePrefix = "window:language:";
+        if (message.StartsWith(languagePrefix, StringComparison.Ordinal))
+        {
+            DesktopLanguage.SetApplicationLanguage(message[languagePrefix.Length..]);
+            ApplySplashOverlayLanguage();
+            UpdateSplashMaximizeButton();
+            return;
+        }
 
         switch (message)
         {

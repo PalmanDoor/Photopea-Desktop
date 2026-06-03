@@ -57,7 +57,7 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             Height="36">
-                    <Button Width="46"
+                    <Button x:Name="SplashMinimizeButton" Width="46"
                             Height="36"
                             Padding="0"
                             BorderThickness="0"
@@ -65,7 +65,7 @@
                             Foreground="#dcdcdc"
                             FontSize="18"
                             Content="−"
-                            ToolTip="Свернуть"
+                            ToolTip="Minimize"
                             Click="OnSplashMinimizeClick" />
                     <Button x:Name="SplashMaximizeButton"
                             Width="46"
@@ -76,9 +76,9 @@
                             Foreground="#dcdcdc"
                             FontSize="15"
                             Content="□"
-                            ToolTip="Развернуть"
+                            ToolTip="Maximize"
                             Click="OnSplashMaximizeClick" />
-                    <Button Width="46"
+                    <Button x:Name="SplashCloseButton" Width="46"
                             Height="36"
                             Padding="0"
                             BorderThickness="0"
@@ -86,7 +86,7 @@
                             Foreground="#dcdcdc"
                             FontSize="18"
                             Content="×"
-                            ToolTip="Закрыть"
+                            ToolTip="Close"
                             Click="OnSplashCloseClick" />
                 </StackPanel>
             </Grid>

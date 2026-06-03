@@ -19,7 +19,7 @@ public partial class App : Application
 
         _startupSplash = new SplashWindow();
         _startupSplash.CloseRequested += OnStartupSplashCloseRequested;
-        _startupSplash.SetProgress(0, "Запуск приложения...");
+        _startupSplash.SetProgress(0, DesktopLanguage.Text("StartingApplication"));
         _startupSplash.Show();
 
         try
@@ -40,7 +40,7 @@ public partial class App : Application
             TimeSpan minimumSplashTime = TimeSpan.FromMilliseconds(1400);
             if (visibleTimer.Elapsed < minimumSplashTime)
             {
-                _startupSplash?.SetProgress(46, "Подготовка запуска...");
+                _startupSplash?.SetProgress(46, DesktopLanguage.Text("PreparingLaunch"));
                 await Task.Delay(minimumSplashTime - visibleTimer.Elapsed);
             }
 
@@ -50,7 +50,7 @@ public partial class App : Application
             UpdateInfo? updateInfo = null;
             try
             {
-                _startupSplash?.SetProgress(46, "Проверка обновлений...");
+                _startupSplash?.SetProgress(46, DesktopLanguage.Text("CheckingUpdates"));
                 using var updateTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(6));
                 updateInfo = await UpdateChecker.CheckForUpdatesAsync(updateTimeout.Token);
             }
@@ -62,7 +62,7 @@ public partial class App : Application
             if (_startupAborted)
                 return;
 
-            _startupSplash?.SetProgress(48, "Загрузка редактора в фоне...");
+            _startupSplash?.SetProgress(48, DesktopLanguage.Text("LoadingEditorBackground"));
 
             var mainWindow = new MainWindow(_startupSplash, updateInfo)
             {
@@ -81,7 +81,7 @@ public partial class App : Application
             _startupSplash?.Close();
 
             MessageBox.Show(
-                "Не удалось запустить приложение. Проверка файлов не пройдена.\n\n" + ex.Message,
+                DesktopLanguage.Text("StartupFilesError") + "\n\n" + ex.Message,
                 "Web Photoshop Desktop",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);

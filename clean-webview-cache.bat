@@ -5,6 +5,7 @@ echo Closing old Web Photoshop Desktop processes if any...
 taskkill /f /im WebPhotoshopDesktop.exe >nul 2>nul
 
 echo Removing WebView2 profile cache...
+if exist "%LOCALAPPDATA%\WebPhotoshopDesktop\ProfileSystemLanguage" rmdir /s /q "%LOCALAPPDATA%\WebPhotoshopDesktop\ProfileSystemLanguage"
 if exist "%LOCALAPPDATA%\WebPhotoshopDesktop\ProfileIntegritySplash" rmdir /s /q "%LOCALAPPDATA%\WebPhotoshopDesktop\ProfileIntegritySplash"
 if exist "%LOCALAPPDATA%\WebPhotoshopDesktop\ProfileSeparateSplash" rmdir /s /q "%LOCALAPPDATA%\WebPhotoshopDesktop\ProfileSeparateSplash"
 if exist "%LOCALAPPDATA%\WebPhotoshopDesktop\ProfileLoadingSplash" rmdir /s /q "%LOCALAPPDATA%\WebPhotoshopDesktop\ProfileLoadingSplash"

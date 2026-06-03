@@ -24,16 +24,16 @@ internal static class StartupIntegrityChecker
         string baseDirectory = AppContext.BaseDirectory;
         string manifestPath = Path.Combine(baseDirectory, "integrity.manifest");
 
-        reportProgress?.Invoke(2, "Поиск списка файлов...");
+        reportProgress?.Invoke(2, DesktopLanguage.Text("FindingManifest"));
 
         if (!File.Exists(manifestPath))
-            throw new IntegrityCheckException("Не найден файл integrity.manifest. Распакуй приложение заново.");
+            throw new IntegrityCheckException(DesktopLanguage.Text("MissingManifest"));
 
         List<ManifestEntry> entries = ReadManifest(manifestPath);
         if (entries.Count < 20)
-            throw new IntegrityCheckException("Файл integrity.manifest повреждён или неполный.");
+            throw new IntegrityCheckException(DesktopLanguage.Text("BrokenManifest"));
 
-        reportProgress?.Invoke(6, "Проверка целостности файлов...");
+        reportProgress?.Invoke(6, DesktopLanguage.Text("CheckingIntegrity"));
 
         for (int i = 0; i < entries.Count; i++)
         {
@@ -44,21 +44,21 @@ internal static class StartupIntegrityChecker
 
             double progress = 6.0 + (39.0 * i / Math.Max(1, entries.Count));
             if (i == 0 || i == entries.Count - 1 || i % 5 == 0)
-                reportProgress?.Invoke(progress, $"Проверка файлов {i + 1}/{entries.Count}...");
+                reportProgress?.Invoke(progress, DesktopLanguage.Format("CheckingFiles", i + 1, entries.Count));
 
             if (!File.Exists(fullPath))
-                throw new IntegrityCheckException("Не найден файл: " + entry.RelativePath);
+                throw new IntegrityCheckException(DesktopLanguage.Format("MissingFile", entry.RelativePath));
 
             var info = new FileInfo(fullPath);
             if (info.Length != entry.Length)
-                throw new IntegrityCheckException("Размер файла изменён: " + entry.RelativePath);
+                throw new IntegrityCheckException(DesktopLanguage.Format("ChangedFileSize", entry.RelativePath));
 
             string actualHash = await ComputeSha256Async(fullPath, cancellationToken);
             if (!StringComparer.OrdinalIgnoreCase.Equals(actualHash, entry.Sha256))
-                throw new IntegrityCheckException("Файл повреждён или изменён: " + entry.RelativePath);
+                throw new IntegrityCheckException(DesktopLanguage.Format("ChangedFileHash", entry.RelativePath));
         }
 
-        reportProgress?.Invoke(45, "Файлы приложения проверены");
+        reportProgress?.Invoke(45, DesktopLanguage.Text("FilesVerified"));
     }
 
     private static List<ManifestEntry> ReadManifest(string manifestPath)
@@ -73,14 +73,14 @@ internal static class StartupIntegrityChecker
 
             string[] parts = line.Split('|');
             if (parts.Length != 3)
-                throw new IntegrityCheckException("Некорректная строка в integrity.manifest: " + line);
+                throw new IntegrityCheckException(DesktopLanguage.Format("BadManifestLine", line));
 
             if (!long.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out long length))
-                throw new IntegrityCheckException("Некорректный размер файла в integrity.manifest: " + parts[0]);
+                throw new IntegrityCheckException(DesktopLanguage.Format("BadManifestSize", parts[0]));
 
             string relativePath = parts[0].Replace('\\', '/');
             if (relativePath.Contains("..", StringComparison.Ordinal) || Path.IsPathRooted(relativePath))
-                throw new IntegrityCheckException("Некорректный путь в integrity.manifest: " + relativePath);
+                throw new IntegrityCheckException(DesktopLanguage.Format("BadManifestPath", relativePath));
 
             entries.Add(new ManifestEntry(relativePath, length, parts[2]));
         }

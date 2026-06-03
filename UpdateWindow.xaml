@@ -26,13 +26,13 @@
             <Grid Grid.Row="0"
                   Background="#484848"
                   MouseLeftButtonDown="OnTitleBarMouseLeftButtonDown">
-                <TextBlock Text="Доступно обновление"
+                <TextBlock x:Name="TitleText" Text="Update available"
                            VerticalAlignment="Center"
                            Margin="12,0,52,0"
                            Foreground="#dddddd"
                            FontSize="13" />
 
-                <Button Width="42"
+                <Button x:Name="CloseButton" Width="42"
                         Height="34"
                         Padding="0"
                         BorderThickness="0"
@@ -41,7 +41,7 @@
                         HorizontalAlignment="Right"
                         FontSize="18"
                         Content="×"
-                        ToolTip="Закрыть"
+                        ToolTip="Close"
                         Click="OnCloseClick">
                     <Button.Style>
                         <Style TargetType="Button">
@@ -85,7 +85,7 @@
                        RenderOptions.BitmapScalingMode="HighQuality" />
 
                 <StackPanel Grid.Column="1">
-                    <TextBlock Text="Новая версия Web Photoshop Desktop готова к установке."
+                    <TextBlock x:Name="MessageText" Text="A new version of Web Photoshop Desktop is ready to install."
                                Foreground="#eeeeee"
                                FontSize="15"
                                TextWrapping="Wrap" />
@@ -102,7 +102,7 @@
                                FontSize="12"
                                TextWrapping="Wrap" />
 
-                    <TextBlock Text="Сохрани текущий проект перед установкой обновления."
+                    <TextBlock x:Name="SaveWarningText" Text="Save your current project before installing the update."
                                Margin="0,12,0,0"
                                Foreground="#bdbdbd"
                                FontSize="12"
@@ -122,11 +122,11 @@
                             Width="132"
                             Height="32"
                             Margin="0,0,8,0"
-                            Content="Скачать setup"
+                            Content="Download setup"
                             Click="OnDownloadClick" />
-                    <Button Width="86"
+                    <Button x:Name="LaterButton" Width="86"
                             Height="32"
-                            Content="Позже"
+                            Content="Later"
                             Click="OnCloseClick" />
                 </StackPanel>
             </Border>

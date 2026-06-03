@@ -15,6 +15,15 @@ public partial class SplashWindow : Window
     public SplashWindow()
     {
         InitializeComponent();
+        ApplyLanguage();
+    }
+
+    private void ApplyLanguage()
+    {
+        TitleText.Text = "Web Photoshop Desktop";
+        MinimizeButton.ToolTip = DesktopLanguage.Text("Minimize");
+        CloseButton.ToolTip = DesktopLanguage.Text("Close");
+        StatusText.Text = DesktopLanguage.Text("StartingApplication");
     }
 
     public void SetStatus(string text)

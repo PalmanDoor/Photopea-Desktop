@@ -13,14 +13,21 @@ public partial class UpdateWindow : Window
         _updateInfo = updateInfo;
         InitializeComponent();
 
-        VersionText.Text = "Версия: " + updateInfo.TagName;
+        Title = DesktopLanguage.Text("UpdateAvailableTitle");
+        TitleText.Text = DesktopLanguage.Text("UpdateAvailableTitle");
+        CloseButton.ToolTip = DesktopLanguage.Text("Close");
+        MessageText.Text = DesktopLanguage.Text("UpdateMessage");
+        SaveWarningText.Text = DesktopLanguage.Text("UpdateSaveWarning");
+        LaterButton.Content = DesktopLanguage.Text("Later");
+
+        VersionText.Text = DesktopLanguage.Format("Version", updateInfo.TagName);
         AssetText.Text = !string.IsNullOrWhiteSpace(updateInfo.SetupAssetName)
-            ? "Файл обновления: " + updateInfo.SetupAssetName
-            : "Setup-файл не найден в релизе. Будет открыта страница релиза.";
+            ? DesktopLanguage.Format("UpdateFile", updateInfo.SetupAssetName)
+            : DesktopLanguage.Text("SetupMissing");
 
         DownloadButton.Content = !string.IsNullOrWhiteSpace(updateInfo.SetupDownloadUrl)
-            ? "Скачать setup"
-            : "Открыть релиз";
+            ? DesktopLanguage.Text("DownloadSetup")
+            : DesktopLanguage.Text("OpenRelease");
     }
 
     private void OnTitleBarMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -47,7 +54,7 @@ public partial class UpdateWindow : Window
         catch (Exception ex)
         {
             MessageBox.Show(
-                "Не удалось открыть ссылку обновления.\n\n" + ex.Message,
+                DesktopLanguage.Text("UpdateOpenError") + "\n\n" + ex.Message,
                 "Web Photoshop Desktop",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
