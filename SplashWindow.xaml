@@ -1,0 +1,157 @@
+<Window x:Class="WebPhotoshopDesktop.SplashWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Web Photoshop Desktop"
+        Width="560"
+        Height="335"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="#3f3f3f"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
+        ShowInTaskbar="False"
+        Icon="Assets/AppIcon.ico">
+
+    <Border BorderThickness="1"
+            BorderBrush="#646464"
+            Background="#3f3f3f"
+            SnapsToDevicePixels="True">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="34" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="34" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0"
+                  Background="#484848"
+                  MouseLeftButtonDown="OnTitleBarMouseLeftButtonDown">
+                <TextBlock Text="Web Photoshop Desktop"
+                           VerticalAlignment="Center"
+                           Margin="12,0,90,0"
+                           Foreground="#dddddd"
+                           FontSize="13" />
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Stretch">
+                    <Button Width="42"
+                            Height="34"
+                            Padding="0"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            Foreground="#dddddd"
+                            FontSize="18"
+                            Content="−"
+                            ToolTip="Свернуть"
+                            Click="OnMinimizeClick">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#5b5b5b" />
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter Property="Background" Value="#666666" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Width="42"
+                            Height="34"
+                            Padding="0"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            Foreground="#dddddd"
+                            FontSize="18"
+                            Content="×"
+                            ToolTip="Закрыть"
+                            Click="OnCloseClick">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#c42b1c" />
+                                        <Setter Property="Foreground" Value="#ffffff" />
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter Property="Background" Value="#8f1d13" />
+                                        <Setter Property="Foreground" Value="#ffffff" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="0,-8,0,0">
+                <Image Source="Assets/AppIcon.png"
+                       Width="110"
+                       Height="110"
+                       Stretch="Uniform"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       HorizontalAlignment="Center" />
+
+                <TextBlock Text="WEB PHOTOSHOP DESKTOP"
+                           Margin="0,20,0,0"
+                           HorizontalAlignment="Center"
+                           Foreground="#eeeeee"
+                           FontSize="23"
+                           FontWeight="SemiBold" />
+
+                <TextBlock Text="Photopea Offline"
+                           Margin="0,6,0,0"
+                           HorizontalAlignment="Center"
+                           Foreground="#bebebe"
+                           FontSize="14" />
+            </StackPanel>
+
+            <Grid Grid.Row="2">
+                <TextBlock x:Name="StatusText"
+                           Text="Запуск приложения..."
+                           Margin="7,0,7,7"
+                           VerticalAlignment="Bottom"
+                           Foreground="#ffd800"
+                           FontSize="12" />
+
+                <Border Height="3"
+                        VerticalAlignment="Bottom"
+                        Background="#202020">
+                    <Grid x:Name="ProgressTrack"
+                          ClipToBounds="True"
+                          SizeChanged="OnProgressTrackSizeChanged">
+                        <Border x:Name="ProgressFill"
+                                Width="0"
+                                HorizontalAlignment="Left"
+                                Background="#ffd800" />
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
