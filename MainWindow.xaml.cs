@@ -34,6 +34,17 @@ public partial class MainWindow : Window
     private const int ResizeGripThickness = 8;
     private const int MonitorDefaultToNearest = 0x00000002;
 
+    // Borderless maximized windows can cover an auto-hidden taskbar hot edge.
+    // Leave a tiny native-pixel gap on the taskbar edge so Windows can reveal it.
+    private const int AutoHideTaskbarRevealGap = 2;
+    private const uint AbmGetState = 0x00000004;
+    private const uint AbmGetTaskbarPos = 0x00000005;
+    private const int AbsAutoHide = 0x00000001;
+    private const uint AbeLeft = 0;
+    private const uint AbeTop = 1;
+    private const uint AbeRight = 2;
+    private const uint AbeBottom = 3;
+
     private bool _webViewReady;
     private bool _suppressClosePrompt;
     private DispatcherTimer? _resizeTimer;
@@ -81,6 +92,17 @@ public partial class MainWindow : Window
         public int Flags;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeAppBarData
+    {
+        public int cbSize;
+        public IntPtr hWnd;
+        public uint uCallbackMessage;
+        public uint uEdge;
+        public NativeRect rc;
+        public IntPtr lParam;
+    }
+
     [DllImport("user32.dll")]
     private static extern bool ReleaseCapture();
 
@@ -98,6 +120,9 @@ public partial class MainWindow : Window
 
     [DllImport("user32.dll", CharSet = CharSet.Auto)]
     private static extern bool GetMonitorInfo(IntPtr hMonitor, ref NativeMonitorInfo monitorInfo);
+
+    [DllImport("shell32.dll")]
+    private static extern IntPtr SHAppBarMessage(uint dwMessage, ref NativeAppBarData pData);
 
     public MainWindow() : this(null, null)
     {
@@ -744,12 +769,101 @@ public partial class MainWindow : Window
         NativeRect full = monitorInfo.Monitor;
         var minMaxInfo = Marshal.PtrToStructure<NativeMinMaxInfo>(lParam);
 
-        minMaxInfo.MaxPosition.X = work.Left - full.Left;
-        minMaxInfo.MaxPosition.Y = work.Top - full.Top;
-        minMaxInfo.MaxSize.X = work.Right - work.Left;
-        minMaxInfo.MaxSize.Y = work.Bottom - work.Top;
+        int maxX = work.Left - full.Left;
+        int maxY = work.Top - full.Top;
+        int maxWidth = work.Right - work.Left;
+        int maxHeight = work.Bottom - work.Top;
+
+        ApplyAutoHideTaskbarRevealGap(full, ref maxX, ref maxY, ref maxWidth, ref maxHeight);
+
+        minMaxInfo.MaxPosition.X = maxX;
+        minMaxInfo.MaxPosition.Y = maxY;
+        minMaxInfo.MaxSize.X = maxWidth;
+        minMaxInfo.MaxSize.Y = maxHeight;
 
         Marshal.StructureToPtr(minMaxInfo, lParam, false);
+    }
+
+    private static void ApplyAutoHideTaskbarRevealGap(
+        NativeRect monitorRect,
+        ref int maxX,
+        ref int maxY,
+        ref int maxWidth,
+        ref int maxHeight)
+    {
+        if (!TryGetAutoHideTaskbar(out uint edge, out NativeRect taskbarRect))
+            return;
+
+        if (!RectsIntersect(monitorRect, taskbarRect))
+            return;
+
+        int gap = AutoHideTaskbarRevealGap;
+
+        switch (edge)
+        {
+            case AbeTop:
+                if (Math.Abs(taskbarRect.Top - monitorRect.Top) <= gap + 2)
+                {
+                    maxY += gap;
+                    maxHeight = Math.Max(0, maxHeight - gap);
+                }
+                break;
+
+            case AbeBottom:
+                if (Math.Abs(taskbarRect.Bottom - monitorRect.Bottom) <= gap + 2)
+                    maxHeight = Math.Max(0, maxHeight - gap);
+                break;
+
+            case AbeLeft:
+                if (Math.Abs(taskbarRect.Left - monitorRect.Left) <= gap + 2)
+                {
+                    maxX += gap;
+                    maxWidth = Math.Max(0, maxWidth - gap);
+                }
+                break;
+
+            case AbeRight:
+                if (Math.Abs(taskbarRect.Right - monitorRect.Right) <= gap + 2)
+                    maxWidth = Math.Max(0, maxWidth - gap);
+                break;
+        }
+    }
+
+    private static bool TryGetAutoHideTaskbar(out uint edge, out NativeRect taskbarRect)
+    {
+        edge = AbeBottom;
+        taskbarRect = default;
+
+        var stateData = new NativeAppBarData
+        {
+            cbSize = Marshal.SizeOf<NativeAppBarData>()
+        };
+
+        IntPtr stateResult = SHAppBarMessage(AbmGetState, ref stateData);
+        bool autoHideEnabled = (((long)stateResult & AbsAutoHide) != 0);
+        if (!autoHideEnabled)
+            return false;
+
+        var positionData = new NativeAppBarData
+        {
+            cbSize = Marshal.SizeOf<NativeAppBarData>()
+        };
+
+        IntPtr positionResult = SHAppBarMessage(AbmGetTaskbarPos, ref positionData);
+        if (positionResult == IntPtr.Zero)
+            return false;
+
+        edge = positionData.uEdge;
+        taskbarRect = positionData.rc;
+        return true;
+    }
+
+    private static bool RectsIntersect(NativeRect a, NativeRect b)
+    {
+        return a.Left < b.Right &&
+               a.Right > b.Left &&
+               a.Top < b.Bottom &&
+               a.Bottom > b.Top;
     }
 
     private bool CanResizeWindow()
