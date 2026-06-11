@@ -4,7 +4,6 @@
     border-style: solid;
     border-width: 0;
     border-color: var(--brdr);
-    column-rule-style:solid;
     column-rule-color: var(--bg-panel);
 }
 
