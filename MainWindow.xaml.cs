@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -233,6 +234,8 @@ public partial class MainWindow : Window
         core.Settings.IsStatusBarEnabled = false;
 
         core.WebMessageReceived += OnWebMessageReceived;
+        core.NavigationStarting += OnNavigationStarting;
+        core.NewWindowRequested += OnNewWindowRequested;
         core.NavigationCompleted += async (_, args) =>
         {
             try
@@ -617,9 +620,68 @@ public partial class MainWindow : Window
         }
     }
 
+    private void OnNavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
+    {
+        if (TryOpenExternalUrl(e.Uri))
+            e.Cancel = true;
+    }
+
+    private void OnNewWindowRequested(object? sender, CoreWebView2NewWindowRequestedEventArgs e)
+    {
+        if (TryOpenExternalUrl(e.Uri))
+            e.Handled = true;
+    }
+
+    private static bool TryOpenExternalUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return false;
+
+        if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+            return false;
+
+        if (!IsExternalPinterestUrl(uri))
+            return false;
+
+        OpenExternalUrl(uri);
+        return true;
+    }
+
+    private static bool IsExternalPinterestUrl(Uri uri)
+    {
+        if (uri.Scheme != Uri.UriSchemeHttps && uri.Scheme != Uri.UriSchemeHttp)
+            return false;
+
+        return uri.Host.Equals("pinterest.com", StringComparison.OrdinalIgnoreCase)
+            || uri.Host.Equals("www.pinterest.com", StringComparison.OrdinalIgnoreCase)
+            || uri.Host.EndsWith(".pinterest.com", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static void OpenExternalUrl(Uri uri)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(uri.AbsoluteUri)
+            {
+                UseShellExecute = true
+            });
+        }
+        catch
+        {
+            // Если внешний браузер не открылся, просто оставляем локальную страницу с ссылкой.
+        }
+    }
+
     private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
         string message = e.TryGetWebMessageAsString();
+
+        const string externalPrefix = "window:openExternal:";
+        if (message.StartsWith(externalPrefix, StringComparison.Ordinal))
+        {
+            TryOpenExternalUrl(message[externalPrefix.Length..]);
+            return;
+        }
 
         const string languagePrefix = "window:language:";
         if (message.StartsWith(languagePrefix, StringComparison.Ordinal))

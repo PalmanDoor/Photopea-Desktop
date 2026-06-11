@@ -2,17 +2,46 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Windows;
 
 namespace WebPhotoshopDesktop;
 
 public partial class App : Application
 {
+    private const string LatestReleasePageUrl = "https://github.com/PalmanDoor/Photopea-Desktop/releases/latest";
+    private const string SingleInstanceMutexName = @"Local\WebPhotoshopDesktop_SingleInstance";
+    private const int SwShow = 5;
+    private const int SwRestore = 9;
+
+    private Mutex? _singleInstanceMutex;
     private SplashWindow? _startupSplash;
     private bool _startupAborted;
 
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern IntPtr FindWindow(string? lpClassName, string? lpWindowName);
+
+    [DllImport("user32.dll")]
+    private static extern bool IsIconic(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
+
     protected override async void OnStartup(StartupEventArgs e)
     {
+        bool isFirstInstance;
+        _singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out isFirstInstance);
+
+        if (!isFirstInstance)
+        {
+            ActivateExistingInstance();
+            Shutdown();
+            return;
+        }
+
         base.OnStartup(e);
 
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
@@ -25,12 +54,24 @@ public partial class App : Application
         try
         {
             var visibleTimer = Stopwatch.StartNew();
+            bool integrityCheckFailed = false;
 
             await Task.Yield();
-            await StartupIntegrityChecker.VerifyAsync((progress, status) =>
+
+            try
             {
-                _startupSplash?.SetProgress(progress, status);
-            });
+                await StartupIntegrityChecker.VerifyAsync((progress, status) =>
+                {
+                    _startupSplash?.SetProgress(progress, status);
+                });
+            }
+            catch (IntegrityCheckException)
+            {
+                // Не пугаем пользователя сообщением про повреждённые файлы.
+                // Просто запускаем текущую сборку и показываем обычное окно обновления.
+                integrityCheckFailed = true;
+                _startupSplash?.SetProgress(45, DesktopLanguage.Text("FilesVerified"));
+            }
 
             if (_startupAborted)
                 return;
@@ -57,6 +98,17 @@ public partial class App : Application
             catch
             {
                 updateInfo = null;
+            }
+
+            if (integrityCheckFailed && updateInfo is null)
+            {
+                updateInfo = new UpdateInfo(
+                    "latest",
+                    "latest",
+                    LatestReleasePageUrl,
+                    null,
+                    null,
+                    null);
             }
 
             if (_startupAborted)
@@ -88,6 +140,64 @@ public partial class App : Application
 
             Shutdown(-1);
         }
+    }
+
+    private static void ActivateExistingInstance()
+    {
+        IntPtr hWnd = IntPtr.Zero;
+
+        try
+        {
+            using var currentProcess = Process.GetCurrentProcess();
+            Process[] processes = Process.GetProcessesByName(currentProcess.ProcessName);
+
+            foreach (Process process in processes)
+            {
+                try
+                {
+                    if (process.Id != currentProcess.Id && process.MainWindowHandle != IntPtr.Zero)
+                    {
+                        hWnd = process.MainWindowHandle;
+                        break;
+                    }
+                }
+                finally
+                {
+                    if (process.Id != currentProcess.Id) process.Dispose();
+                }
+            }
+        }
+        catch
+        {
+            hWnd = IntPtr.Zero;
+        }
+
+        if (hWnd == IntPtr.Zero)
+            hWnd = FindWindow(null, "Web Photoshop Desktop");
+
+        if (hWnd == IntPtr.Zero)
+            return;
+
+        if (IsIconic(hWnd))
+            ShowWindow(hWnd, SwRestore);
+        else
+            ShowWindow(hWnd, SwShow);
+
+        SetForegroundWindow(hWnd);
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        try
+        {
+            _singleInstanceMutex?.ReleaseMutex();
+            _singleInstanceMutex?.Dispose();
+        }
+        catch
+        {
+        }
+
+        base.OnExit(e);
     }
 
     private void OnStartupSplashCloseRequested(object? sender, EventArgs e)
