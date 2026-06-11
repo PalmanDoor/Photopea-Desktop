@@ -1092,8 +1092,51 @@
 
     function isInteractiveTarget(target) {
         return !!(target && target.closest && target.closest(
-            'button,a,input,textarea,select,[contenteditable="true"],.desktop-window-controls,.fitem,.bbtn,.dropdown,.contextmenu,.menuitem'
+            'button,a,input,textarea,select,[contenteditable="true"],.desktop-window-controls,.desktop-window-button,.fitem,.bbtn,.dropdown,.contextmenu,.menuitem,#ap-topbar-left,#ap-topbar-left1,#ap-topbar-left2,#ap-topbar-search,#ap-topbar-account,#ap-topbar-fullscreen'
         ));
+    }
+
+    function isPointInsideElement(event, element) {
+        if (!event || !element || !element.getBoundingClientRect) return false;
+        var rect = element.getBoundingClientRect();
+        if (!rect || rect.width <= 0 || rect.height <= 0) return false;
+        return event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+    }
+
+    function isBlockedTopbarDragArea(event) {
+        var selectors = [
+            '#ap-topbar-left',
+            '#ap-topbar-left1',
+            '#ap-topbar-left2',
+            '#ap-topbar-search',
+            '#ap-topbar-account',
+            '#ap-topbar-fullscreen',
+            '#desktop-window-controls'
+        ];
+
+        for (var i = 0; i < selectors.length; i++) {
+            var element = document.querySelector(selectors[i]);
+            if (isPointInsideElement(event, element)) return true;
+        }
+
+        return false;
+    }
+
+    function shouldStartWindowDrag(event, topbar) {
+        if (!event || event.button !== 0 || !topbar) return false;
+        if (isInteractiveTarget(event.target)) return false;
+        if (isBlockedTopbarDragArea(event)) return false;
+        return isPointInsideElement(event, topbar);
+    }
+
+    function disableNativeTopbarDrag() {
+        var nodes = document.querySelectorAll('#ap-topbar,#ap-topbar *');
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (!node || !node.style) continue;
+            node.style.webkitAppRegion = 'no-drag';
+            node.style.appRegion = 'no-drag';
+        }
     }
 
     function createSvg(viewBox, paths) {
@@ -1167,7 +1210,9 @@
             'html::-webkit-scrollbar,body::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;}\n' +
             'body>.app{width:100vw!important;max-width:100vw!important;height:100vh!important;max-height:100vh!important;overflow:hidden!important;}\n' +
             'body>.app>div:first-child{width:100vw!important;max-width:100vw!important;height:100vh!important;max-height:100vh!important;overflow:hidden!important;}\n' +
-            '#ap-topbar{width:100vw!important;max-width:100vw!important;}\n' +
+            '#ap-topbar{width:100vw!important;max-width:100vw!important;app-region:no-drag!important;-webkit-app-region:no-drag!important;}\n' +
+            '#ap-topbar,#ap-topbar *{app-region:no-drag!important;-webkit-app-region:no-drag!important;}\n' +
+            '#ap-topbar-left,#ap-topbar-left1,#ap-topbar-left2,#ap-topbar-left button,#ap-topbar-left .fitem,#ap-topbar-search,#ap-topbar-account,#ap-topbar-fullscreen,#desktop-window-controls,#desktop-window-controls *{app-region:no-drag!important;-webkit-app-region:no-drag!important;}\n' +
             '#ap-topbar-fullscreen{display:none!important;width:0!important;min-width:0!important;margin:0!important;padding:0!important;overflow:hidden!important;visibility:hidden!important;}\n' +
             '.desktop-window-controls{display:inline-flex!important;align-items:stretch;height:31px;margin-left:6px;color:var(--text-color,#ddd);background-color:var(--base,#474747);-webkit-app-region:no-drag;position:relative;z-index:2147483647;}\n' +
             '.desktop-window-button{width:39px;height:31px;margin:0;padding:0;display:inline-flex!important;align-items:center;justify-content:center;border:0;border-radius:0;outline:none;color:var(--text-color,#ddd);background:transparent;opacity:.92;cursor:default;box-shadow:none;text-shadow:none;-webkit-app-region:no-drag;}\n' +
@@ -1321,6 +1366,7 @@
 
         if (controls.parentNode !== right) right.appendChild(controls);
         updateWindowControlsLanguage();
+        disableNativeTopbarDrag();
 
         right.style.padding = '0';
         right.style.height = '31px';
@@ -1333,13 +1379,16 @@
             topbar.classList.add('desktop-titlebar-ready');
 
             topbar.addEventListener('mousedown', function (event) {
-                if (event.button !== 0 || isInteractiveTarget(event.target)) return;
+                if (!shouldStartWindowDrag(event, topbar)) return;
+                event.preventDefault();
+                event.stopPropagation();
                 postWindowMessage('window:drag');
             }, true);
 
             topbar.addEventListener('dblclick', function (event) {
-                if (isInteractiveTarget(event.target)) return;
+                if (!shouldStartWindowDrag(event, topbar)) return;
                 event.preventDefault();
+                event.stopPropagation();
                 postWindowMessage('window:toggleMaximize');
             }, true);
         }
@@ -1599,6 +1648,143 @@
 
     window.desktopShowUnsavedProjectDialog = showUnsavedProjectDialog;
 
+
+    function desktopIsInstallPhotopeaText(text) {
+        text = desktopNormalizeText(text).toLowerCase();
+        return text === 'install photopea' ||
+            text === 'установить photopea' ||
+            text === 'встановити photopea' ||
+            text === 'install photopea offline' ||
+            text === 'установить photopea offline' ||
+            text === 'встановити photopea offline';
+    }
+
+    function removeInstallPhotopeaButton() {
+        try {
+            var nodes = document.querySelectorAll('.fitem,.menuitem,.bbtn,button,a,div');
+            for (var i = 0; i < nodes.length; i++) {
+                var node = nodes[i];
+                if (!node || node.id === 'ap-topbar' || node.id === 'ap-topbar-right' || node.id === 'desktop-window-controls') continue;
+                if (node.querySelector && node.querySelector('.fitem,.menuitem,.bbtn,button,a')) continue;
+
+                var text = desktopNormalizeText(node.innerText || node.textContent || '');
+                if (!desktopIsInstallPhotopeaText(text)) continue;
+
+                node.style.setProperty('display', 'none', 'important');
+                node.style.setProperty('visibility', 'hidden', 'important');
+                node.setAttribute('aria-hidden', 'true');
+            }
+        } catch (_ignored) { }
+    }
+
+    function installInstallPhotopeaClickBlocker() {
+        if (document.__desktopInstallPhotopeaClickBlocker) return;
+        document.__desktopInstallPhotopeaClickBlocker = true;
+        document.addEventListener('click', function (event) {
+            try {
+                var target = event.target;
+                var node = target && target.closest && target.closest('.fitem,.menuitem,.bbtn,button,a,div');
+                if (!node) return;
+                var text = desktopNormalizeText(node.innerText || node.textContent || '');
+                if (!desktopIsInstallPhotopeaText(text)) return;
+                event.preventDefault();
+                event.stopPropagation();
+                if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+                node.style.setProperty('display', 'none', 'important');
+            } catch (_ignored) { }
+        }, true);
+    }
+
+
+    function desktopIsRemovedOnlineResourceText(text) {
+        text = desktopNormalizeText(text).toLowerCase();
+        if (!text) return false;
+
+        return text === 'gallery' ||
+            text === 'галерея' ||
+            text === 'pinterest' ||
+            text === 'peasmaker' ||
+            text === 'templates' ||
+            text === 'шаблоны' ||
+            text === 'шаблони' ||
+            text === 'plugins' ||
+            text === 'плагины' ||
+            text === 'плагіни' ||
+            text === 'photoshop plugins' ||
+            text === 'photopea plugins' ||
+            text === 'resources' ||
+            text === 'ресурсы' ||
+            text === 'ресурси' ||
+            text === 'install plugins' ||
+            text === 'установить плагины' ||
+            text === 'встановити плагіни';
+    }
+
+    function hideDesktopMenuNode(node) {
+        if (!node || node.__desktopRemovedResourceItem) return;
+        node.__desktopRemovedResourceItem = true;
+        node.style.setProperty('display', 'none', 'important');
+        node.style.setProperty('visibility', 'hidden', 'important');
+        node.setAttribute('aria-hidden', 'true');
+
+        try {
+            var previous = node.previousElementSibling;
+            if (previous && desktopIsSeparatorLike(previous)) {
+                previous.style.setProperty('display', 'none', 'important');
+                previous.style.setProperty('visibility', 'hidden', 'important');
+            }
+        } catch (_ignored) { }
+    }
+
+    function desktopIsSeparatorLike(node) {
+        if (!node) return false;
+        var text = desktopNormalizeText(node.innerText || node.textContent || '');
+        if (text.length !== 0) return false;
+
+        var style = '';
+        try { style = node.getAttribute('style') || ''; } catch (_ignored) { }
+        var className = '';
+        try { className = String(node.className || ''); } catch (_ignored2) { }
+
+        return /border|height\s*:\s*1px|background/i.test(style) ||
+            /sep|separator|split|line|dc/i.test(className) ||
+            node.offsetHeight <= 3;
+    }
+
+    function removeOnlineResourceItems() {
+        try {
+            var nodes = document.querySelectorAll('.fitem,.menuitem,.bbtn,button,a,div,span');
+            for (var i = 0; i < nodes.length; i++) {
+                var node = nodes[i];
+                if (!node || node.id === 'ap-topbar' || node.id === 'ap-topbar-right' || node.id === 'desktop-window-controls') continue;
+                if (node.querySelector && node.querySelector('.fitem,.menuitem,.bbtn,button,a')) continue;
+
+                var text = desktopNormalizeText(node.innerText || node.textContent || '');
+                if (!desktopIsRemovedOnlineResourceText(text)) continue;
+
+                hideDesktopMenuNode(node);
+            }
+        } catch (_ignored) { }
+    }
+
+    function installOnlineResourceClickBlocker() {
+        if (document.__desktopOnlineResourceClickBlocker) return;
+        document.__desktopOnlineResourceClickBlocker = true;
+        document.addEventListener('click', function (event) {
+            try {
+                var target = event.target;
+                var node = target && target.closest && target.closest('.fitem,.menuitem,.bbtn,button,a,div,span');
+                if (!node) return;
+                var text = desktopNormalizeText(node.innerText || node.textContent || '');
+                if (!desktopIsRemovedOnlineResourceText(text)) return;
+                event.preventDefault();
+                event.stopPropagation();
+                if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+                hideDesktopMenuNode(node);
+            } catch (_ignored) { }
+        }, true);
+    }
+
     function hideHomeBottomImage() {
         try {
             var images = document.querySelectorAll('img[src^="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIi"]');
@@ -1628,6 +1814,10 @@
         installResizeHandles();
         fixTopbarSearchButton();
         updateUnsavedProjectDialogLanguage();
+        removeInstallPhotopeaButton();
+        installInstallPhotopeaClickBlocker();
+        removeOnlineResourceItems();
+        installOnlineResourceClickBlocker();
         hideHomeBottomImage();
         notifyDesktopLanguageChanged();
     }
